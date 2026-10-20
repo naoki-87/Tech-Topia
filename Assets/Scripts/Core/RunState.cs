@@ -3,7 +3,7 @@ namespace SteamEngineer
 {
     public class RunState
     {
-        public const int Slots = 4, StagesPerArea = 2;
+        public const int Slots = 4, StagesPerArea = 5;
         public EquipmentData[] equipped = new EquipmentData[Slots];
         public int[] level = new int[Slots];
         public List<AreaData> remaining, choices = new List<AreaData>();
