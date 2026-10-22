@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6865678087094320347}
   - component: {fileID: 8764157530286883548}
   - component: {fileID: 4447473439737408655}
+  - component: {fileID: 4587747192697364546}
   m_Layer: 8
   m_Name: Boss_Gear
   m_TagString: Untagged
@@ -142,6 +143,20 @@ MonoBehaviour:
   muzzle: {fileID: 939495803959110028}
   leapSpeed: 5
   leapPower: 12
+--- !u!114 &4587747192697364546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3047860887117763124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8062ae3e391494b48a0a9f9ecf17a43f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.HitFlash
+  flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  duration: 0.1
 --- !u!1 &7350915909879171948
 GameObject:
   m_ObjectHideFlags: 0

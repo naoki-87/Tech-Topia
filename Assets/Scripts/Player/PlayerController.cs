@@ -12,12 +12,21 @@ namespace SteamEngineer
         public float moveSpeed = 6f, jumpSpeed = 12f, gravity = 3f, dashSpeed = 16f, dashTime = 0.15f;
         public float coyoteTime = 0.1f, jumpBuffer = 0.12f, attackCooldown = 0.25f, hurtInvuln = 1f;
         public Health Health { get; private set; } public PlayerStats Stats { get; private set; }
+        public float dashCost = 25f, airJumpCost = 20f;
+        Energy energy;
         Rigidbody2D rb; int facing = 1, jumpsUsed; float coyote, buffer, dashT, dashCd, atkCd; bool grounded, dashing;
 
-        void Awake() { rb = GetComponent<Rigidbody2D>(); Health = GetComponent<Health>(); rb.gravityScale = gravity; rb.freezeRotation = true; }
+        void Awake()
+        {
+            rb = GetComponent<Rigidbody2D>(); Health = GetComponent<Health>();
+            energy = GetComponent<Energy>(); if (energy == null) energy = gameObject.AddComponent<Energy>();   // 付け忘れ対策
+            rb.gravityScale = gravity; rb.freezeRotation = true;
+        }
         void Start()
         {
             var run = GameManager.Instance.Run; Stats = PlayerStats.Build(run);
+            energy.Init(Stats.maxEnergy, Stats.energyRegen);
+            energy.costMul = Stats.energyCostMul;
             Health.invulnTime = hurtInvuln; Health.Set(run.hp, Stats.maxHp);
             Health.damageModifier = d => Mathf.Max(1, Mathf.RoundToInt(d * (1f - Stats.dmgReduction)));
             Health.Died += () => GameManager.Instance.OnPlayerDead();
@@ -38,7 +47,7 @@ namespace SteamEngineer
             dashCd -= dt; atkCd -= dt;
             if (x != 0) { facing = x > 0 ? 1 : -1; transform.localScale = new Vector3(facing, 1, 1); }
 
-            if (dash && dashCd <= 0 && !dashing) { dashing = true; dashT = dashTime; dashCd = Stats.dashCooldown; rb.gravityScale = 0; Health.GrantInvuln(dashTime); }
+            if (dash && dashCd <= 0 && !dashing && energy.TryUse(dashCost)) { dashing = true; dashT = dashTime; dashCd = Stats.dashCooldown; rb.gravityScale = 0; Health.GrantInvuln(dashTime); }
             if (dashing)
             {
                 dashT -= dt; rb.linearVelocity = new Vector2(facing * dashSpeed, 0);
@@ -53,7 +62,7 @@ namespace SteamEngineer
                     else
                     {
                         if (jumpsUsed == 0) jumpsUsed = 1;                  // 崖から落ちた場合は1回消費済み
-                        if (jumpsUsed < 1 + Stats.extraJumps) { v.y = jumpSpeed; jumpsUsed++; buffer = 0; }
+                        if (jumpsUsed < 1 + Stats.extraJumps && energy.TryUse(airJumpCost)) { v.y = jumpSpeed; jumpsUsed++; buffer = 0; }
                     }
                 }
                 if (jumpUp && v.y > 0) v.y *= 0.5f;                         // 可変ジャンプ

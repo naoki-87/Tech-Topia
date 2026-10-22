@@ -210,6 +210,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4680499137713827912}
+  - component: {fileID: -5852882671794520414}
+  - component: {fileID: -3270648701487266515}
   m_Layer: 8
   m_Name: Enemy_Walker
   m_TagString: Untagged
@@ -233,3 +235,31 @@ Transform:
   - {fileID: 8425041273649666691}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-5852882671794520414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2984339464703727392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c5eb3549180b764eadbcc239b1770f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.Health
+  max: 1
+  invulnTime: 0
+--- !u!114 &-3270648701487266515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2984339464703727392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8062ae3e391494b48a0a9f9ecf17a43f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.HitFlash
+  flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  duration: 0.1

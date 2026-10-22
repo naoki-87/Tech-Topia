@@ -6,7 +6,7 @@ namespace SteamEngineer
         public int max = 1; public float invulnTime = 0f;
         public int Current { get; private set; } public bool IsDead { get; private set; }
         public Func<int, int> damageModifier;
-        public event Action<int, int> Changed; public event Action Died;
+        public event Action<int, int> Changed; public event Action Died; public event Action Damaged;
         float invUntil;
         void Awake() { Current = max; }
         public void Set(int cur, int m) { max = m; Current = Mathf.Clamp(cur, 1, m); Changed?.Invoke(Current, max); }
@@ -18,6 +18,7 @@ namespace SteamEngineer
             if (damageModifier != null) amount = damageModifier(amount);
             Current = Mathf.Max(0, Current - amount); invUntil = Time.time + invulnTime;
             Changed?.Invoke(Current, max);
+            Damaged?.Invoke();
             if (Current <= 0) { IsDead = true; Died?.Invoke(); }
             return true;
         }
