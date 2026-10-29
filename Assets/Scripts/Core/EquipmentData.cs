@@ -17,6 +17,8 @@ namespace SteamEngineer
         public float energyMaxBase, energyMaxPerLevel;     // 胴: 最大エネルギー
         public float regenBase, regenPerLevel;             // 胴: 回復量
         public float costReducePerLevel;                   // 脚: 消費量の減少(0.04 = 1レベルで4%減)
+        [Header("Ability")]
+        public AbilityBase ability;
         [Header("Evolution (初期装備)")] public EquipmentData evolvesTo; public int evolveLevel = 8;
     }
 }

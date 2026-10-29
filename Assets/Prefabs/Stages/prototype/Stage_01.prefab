@@ -2115,6 +2115,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8422004452898109264}
+  - {fileID: 8415988305087567464}
   m_Father: {fileID: 2799144062423914154}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8902265629651354870
@@ -2223,6 +2224,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 5357872695872728581, guid: 9186c7919f34e724bab57c1941cf4752, type: 3}
   m_PrefabInstance: {fileID: 2285883395827323024}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2616086768230025462
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3682902270813053657}
+    m_Modifications:
+    - target: {fileID: 632274982690505950, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_Name
+      value: Gimmick_SteamBoiler
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+--- !u!4 &8415988305087567464 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5802234769834335902, guid: e8a278c4f03d3154dbcd87bdc0468bf7, type: 3}
+  m_PrefabInstance: {fileID: 2616086768230025462}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5820303600408154596
 PrefabInstance:

@@ -28,5 +28,11 @@ MonoBehaviour:
   attackPerLevel: 1
   extraJumps: 0
   dashCdReductionPerLevel: 0
+  energyMaxBase: 0
+  energyMaxPerLevel: 0
+  regenBase: 0
+  regenPerLevel: 0
+  costReducePerLevel: 0
+  ability: {fileID: 11400000, guid: 767a751e667853b4b97d80c511798f97, type: 2}
   evolvesTo: {fileID: 0}
   evolveLevel: 8

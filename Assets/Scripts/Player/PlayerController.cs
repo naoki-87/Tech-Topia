@@ -14,6 +14,9 @@ namespace SteamEngineer
         public Health Health { get; private set; } public PlayerStats Stats { get; private set; }
         public float dashCost = 25f, airJumpCost = 20f;
         Energy energy;
+        AbilityBase ability; float abilityCd;
+        public Rigidbody2D Body => rb;
+        public int Facing => facing;
         Rigidbody2D rb; int facing = 1, jumpsUsed; float coyote, buffer, dashT, dashCd, atkCd; bool grounded, dashing;
 
         void Awake()
@@ -27,6 +30,7 @@ namespace SteamEngineer
             var run = GameManager.Instance.Run; Stats = PlayerStats.Build(run);
             energy.Init(Stats.maxEnergy, Stats.energyRegen);
             energy.costMul = Stats.energyCostMul;
+            ability = FindAbility(run);
             Health.invulnTime = hurtInvuln; Health.Set(run.hp, Stats.maxHp);
             Health.damageModifier = d => Mathf.Max(1, Mathf.RoundToInt(d * (1f - Stats.dmgReduction)));
             Health.Died += () => GameManager.Instance.OnPlayerDead();
@@ -44,7 +48,7 @@ namespace SteamEngineer
             grounded = Physics2D.OverlapBox(groundCheck.position, groundBox, 0, groundMask);
             if (grounded) { coyote = coyoteTime; jumpsUsed = 0; } else coyote -= dt;      // コヨーテタイム
             buffer = jumpDown ? jumpBuffer : buffer - dt;                                  // 先行入力
-            dashCd -= dt; atkCd -= dt;
+            dashCd -= dt; atkCd -= dt; abilityCd -= dt;
             if (x != 0) { facing = x > 0 ? 1 : -1; transform.localScale = new Vector3(facing, 1, 1); }
 
             if (dash && dashCd <= 0 && !dashing && energy.TryUse(dashCost)) { dashing = true; dashT = dashTime; dashCd = Stats.dashCooldown; rb.gravityScale = 0; Health.GrantInvuln(dashTime); }
@@ -69,6 +73,11 @@ namespace SteamEngineer
                 rb.linearVelocity = v;
             }
             if (atk && atkCd <= 0) { atkCd = attackCooldown; Attack(); }
+
+            if (kb.lKey.wasPressedThisFrame && ability != null && abilityCd <= 0 && energy.TryUse(ability.energyCost))
+            {
+                abilityCd = ability.cooldown; ability.Activate(this);
+            }
         }
         void Attack()
         {
@@ -91,6 +100,17 @@ namespace SteamEngineer
         {
             if (groundCheck) Gizmos.DrawWireCube(groundCheck.position, groundBox);
             if (attackPoint) Gizmos.DrawWireCube(attackPoint.position, attackBox);
+        }
+        AbilityBase FindAbility(RunState r)
+        {
+            int[] order = { (int)EquipSlot.Weapon, (int)EquipSlot.Legs, (int)EquipSlot.Body, (int)EquipSlot.Head };
+            foreach (int i in order) { var e = r.equipped[i]; if (e != null && e.ability != null) return e.ability; }
+            return null;
+        }
+        public void EmitElement(Element el, Vector2 center, float radius)
+        {
+            foreach (var c in Physics2D.OverlapCircleAll(center, radius))
+                if (c.TryGetComponent(out ElementGimmick g)) g.Activate(el);
         }
     }
 }
