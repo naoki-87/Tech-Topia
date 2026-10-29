@@ -11,5 +11,6 @@ namespace SteamEngineer
         public GameObject[] stagePrefabs;     // 通常ステージ(ランダム選択)
         public GameObject bossStagePrefab;    // 5ステージ目
         public EquipmentData[] craftable;     // このエリアの素材で作れる装備
+        public int requiredRank;              // このエリアが選択肢に出る工房ランク(0=素人)
     }
 }

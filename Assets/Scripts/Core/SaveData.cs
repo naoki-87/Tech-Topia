@@ -6,6 +6,7 @@ namespace SteamEngineer
     {
         public int cores;                 // 永続コア(基礎強化に使う)
         public int commonMaterials;       // 汎用素材
+        public int rank;                  // 工房ランク 0=素人 1=職人 2=達人 3=工房 4=伝説
         public int[] baseLevel = new int[4];   // 部位ごとの基礎強化(周回開始時の上限レベル)
         static string FilePath => Path.Combine(Application.persistentDataPath, "save.json");
         public static SaveData Load()

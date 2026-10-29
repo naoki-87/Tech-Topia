@@ -15,8 +15,7 @@ MonoBehaviour:
   displayName: "\u30EC\u30F3\u30C1"
   icon: {fileID: 0}
   slot: 3
-  tier: 0
-  sourceArea: {fileID: 0}
+  sourceArea: {fileID: 11400000, guid: c521eb94aadcbbe40be551970fa1c911, type: 2}
   isStarter: 1
   coreCost: 3
   commonCost: 5

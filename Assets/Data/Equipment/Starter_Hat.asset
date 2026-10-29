@@ -15,8 +15,7 @@ MonoBehaviour:
   displayName: "\u5E3D\u5B50"
   icon: {fileID: 0}
   slot: 0
-  tier: 0
-  sourceArea: {fileID: 0}
+  sourceArea: {fileID: 11400000, guid: c521eb94aadcbbe40be551970fa1c911, type: 2}
   isStarter: 1
   coreCost: 3
   commonCost: 5
@@ -28,5 +27,11 @@ MonoBehaviour:
   attackPerLevel: 0
   extraJumps: 0
   dashCdReductionPerLevel: 0
+  energyMaxBase: 0
+  energyMaxPerLevel: 0
+  regenBase: 0
+  regenPerLevel: 0
+  costReducePerLevel: 0
+  ability: {fileID: 0}
   evolvesTo: {fileID: 0}
   evolveLevel: 8

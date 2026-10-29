@@ -23,3 +23,4 @@ MonoBehaviour:
   - {fileID: 3483358668282175389, guid: a88cb203dc96ad54a996ea7f30571561, type: 3}
   bossStagePrefab: {fileID: 1139021799159812692, guid: 36d3ad3d5b816c74ab4fab871cc172a6, type: 3}
   craftable: []
+  requiredRank: 0

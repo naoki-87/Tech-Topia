@@ -5,7 +5,7 @@ namespace SteamEngineer
     public class EquipmentData : ScriptableObject
     {
         public string displayName; public Sprite icon;
-        public EquipSlot slot; public Tier tier; public AreaData sourceArea;
+        public EquipSlot slot; public AreaData sourceArea;
         public bool isStarter;
         [Header("Craft cost")] public int coreCost = 3; public int commonCost = 5;
         [Header("Stats (Tier倍率: 1+0.25*tier)")]

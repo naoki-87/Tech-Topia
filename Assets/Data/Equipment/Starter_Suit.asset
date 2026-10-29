@@ -15,8 +15,7 @@ MonoBehaviour:
   displayName: "\u4F5C\u696D\u7740"
   icon: {fileID: 0}
   slot: 1
-  tier: 0
-  sourceArea: {fileID: 0}
+  sourceArea: {fileID: 11400000, guid: c521eb94aadcbbe40be551970fa1c911, type: 2}
   isStarter: 1
   coreCost: 3
   commonCost: 5
@@ -33,5 +32,6 @@ MonoBehaviour:
   regenBase: 0
   regenPerLevel: 1
   costReducePerLevel: 0
+  ability: {fileID: 0}
   evolvesTo: {fileID: 0}
   evolveLevel: 8
