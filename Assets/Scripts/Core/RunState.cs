@@ -12,6 +12,8 @@ namespace SteamEngineer
         public AreaData current;
         public int areasCleared, stageIndex, rerolls = 1, coresCollected, hp;
         public bool won, swapped;
+        public Dictionary<PassiveBase, int> counters = new Dictionary<PassiveBase, int>();
+        float matCarry;      // 素材獲得量アップの端数
         public Dictionary<(AreaData, Tier), int> mats = new Dictionary<(AreaData, Tier), int>();
         readonly SaveData save;
 
@@ -64,8 +66,29 @@ namespace SteamEngineer
         // ---------- 素材 ----------
         public void AddStageMaterial(int n)
         {
-            if (current == null) return; var k = (current, DropTier);
-            mats[k] = (mats.TryGetValue(k, out var v) ? v : 0) + n;
+            if (current == null) return;
+            float bonus = 0f;
+            for (int i = 0; i < Slots; i++)
+                if (equipped[i] != null && equipped[i].passive != null) bonus += equipped[i].passive.MatGainBonus(tier[i]);
+            matCarry += n * (1f + bonus);                                   // 端数は持ち越す
+            int gain = Mathf.FloorToInt(matCarry + 0.0001f);
+            matCarry = Mathf.Max(0f, matCarry - gain);
+            if (gain <= 0) return;
+
+            var k = (current, DropTier);
+            mats[k] = (mats.TryGetValue(k, out var v) ? v : 0) + gain;
+
+            var p = Object.FindFirstObjectByType<PlayerController>();      // ステージ中のみ存在する
+            for (int i = 0; i < Slots; i++)
+                if (equipped[i] != null && equipped[i].passive != null) equipped[i].passive.OnMaterialGained(this, p, tier[i], gain);
+        }
+        public int TotalMaterials() { int s = 0; foreach (var kv in mats) s += kv.Value; return s; }
+        public int AttackBonus()
+        {
+            int b = 0;
+            for (int i = 0; i < Slots; i++)
+                if (equipped[i] != null && equipped[i].passive != null) b += equipped[i].passive.AttackBonus(this, tier[i]);
+            return b;
         }
         public int Mat(AreaData a, Tier t) => mats.TryGetValue((a, t), out var v) ? v : 0;
 

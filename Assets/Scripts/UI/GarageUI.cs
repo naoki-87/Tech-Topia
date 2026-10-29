@@ -55,13 +55,18 @@ namespace SteamEngineer
 
             // ---- 状況表示 ----
             var sb = new StringBuilder();
-            sb.AppendLine($"工房ランク {rankNames[save.rank]}  /  HP {run.hp}/{st.maxHp}  /  エネルギー {st.maxEnergy:0}  /  汎用素材 {save.commonMaterials}");
+            sb.AppendLine($"工房ランク {rankNames[save.rank]}  /  HP {run.hp}/{st.maxHp}  /  攻撃力 {st.attack + run.AttackBonus()}  /  エネルギー {st.maxEnergy:0}  /  汎用素材 {save.commonMaterials}");
             for (int s = 0; s < RunState.Slots; s++)
             {
                 var e = run.equipped[s];
                 sb.Append($"{slotNames[s]}:{(e ? e.displayName : "-")}[{run.tier[s].Label()}]Lv{run.level[s]}  ");
             }
             sb.AppendLine();
+            for (int s = 0; s < RunState.Slots; s++)
+            {
+                var e = run.equipped[s];
+                if (e != null && e.passive != null) sb.AppendLine($"  [{slotNames[s]}] {e.passive.displayName}: {e.passive.Describe(run.tier[s])}");
+            }
             if (st.setBonus) sb.AppendLine("装備統一ボーナス発動中");
             foreach (var a in gm.allAreas)
             {

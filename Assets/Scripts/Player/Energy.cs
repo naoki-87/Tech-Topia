@@ -22,6 +22,10 @@ namespace SteamEngineer
             if (Current < c) return false;
             Current -= c; lastUse = Time.time; Changed?.Invoke(Current, max); return true;
         }
+        public void Restore(float amount)
+        {
+            Current = Mathf.Min(max, Current + amount); Changed?.Invoke(Current, max);
+        }
         void Update()
         {
             if (Current >= max || Time.time - lastUse < regenDelay) return;   // Žg‚Á‚½’¼Œã‚Í‰ñ•œ‚µ‚È‚¢

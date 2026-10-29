@@ -33,5 +33,6 @@ MonoBehaviour:
   regenPerLevel: 0
   costReducePerLevel: 0
   ability: {fileID: 11400000, guid: 767a751e667853b4b97d80c511798f97, type: 2}
+  passive: {fileID: 11400000, guid: 6fcc9feec9a2c0348a63e821813242bf, type: 2}
   evolvesTo: {fileID: 0}
   evolveLevel: 8

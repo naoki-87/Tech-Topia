@@ -17,6 +17,12 @@ namespace SteamEngineer
         AbilityBase ability; float abilityCd;
         public Rigidbody2D Body => rb;
         public int Facing => facing;
+        public int CurrentAttack => Stats.attack + GameManager.Instance.Run.AttackBonus();
+        public void DamageAround(Vector2 center, float radius, int dmg)
+        {
+            foreach (var c in Physics2D.OverlapCircleAll(center, radius))
+                if (c.GetComponent<EnemyBase>() != null && c.TryGetComponent(out Health h)) h.Damage(dmg);
+        }
         Rigidbody2D rb; int facing = 1, jumpsUsed; float coyote, buffer, dashT, dashCd, atkCd; bool grounded, dashing;
 
         void Awake()
@@ -84,7 +90,7 @@ namespace SteamEngineer
             foreach (var c in Physics2D.OverlapBoxAll(attackPoint.position, attackBox, 0, hitMask))
             {
                 if (c.TryGetComponent(out Repairable r)) r.Repair(this);
-                else if (c.TryGetComponent(out Health h) && h != Health) h.Damage(Stats.attack);
+                else if (c.TryGetComponent(out Health h) && h != Health) h.Damage(CurrentAttack);
             }
         }
         public void TakeHit(int dmg, Vector2 from)

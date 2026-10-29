@@ -19,6 +19,7 @@ namespace SteamEngineer
         public float costReducePerLevel;                   // 脚: 消費量の減少(0.04 = 1レベルで4%減)
         [Header("Ability")]
         public AbilityBase ability;
+        public PassiveBase passive;
         [Header("Evolution (初期装備)")] public EquipmentData evolvesTo; public int evolveLevel = 8;
     }
 }

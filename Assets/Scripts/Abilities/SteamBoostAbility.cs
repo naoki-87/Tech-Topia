@@ -1,15 +1,17 @@
 using UnityEngine;
 namespace SteamEngineer
 {
-    // 蒸気ブースト: 足元から蒸気を噴き出して跳ね上がる。足元の蒸気ギミックも起動する
+    // スチーム・ジャンプ: 足元から蒸気を噴射して跳び上がる。近くの敵にダメージ、蒸気ギミックを起動する
     [CreateAssetMenu(menuName = "SteamEngineer/Ability/SteamBoost")]
     public class SteamBoostAbility : AbilityBase
     {
-        public float boostSpeed = 14f, radius = 1.5f;
+        public float boostSpeed = 14f, radius = 2f, damageMul = 1f;
         public override void Activate(PlayerController p)
         {
             var v = p.Body.linearVelocity; v.y = boostSpeed; p.Body.linearVelocity = v;
-            p.EmitElement(element, p.groundCheck.position, radius);
+            Vector2 foot = p.groundCheck.position;
+            p.EmitElement(element, foot, radius);
+            p.DamageAround(foot, radius, Mathf.Max(1, Mathf.RoundToInt(p.CurrentAttack * damageMul)));
         }
     }
 }

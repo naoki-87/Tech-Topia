@@ -24,6 +24,7 @@ namespace SteamEngineer
                 s.maxEnergy += (e.energyMaxBase + e.energyMaxPerLevel * lv) * m;
                 s.energyRegen += (e.regenBase + e.regenPerLevel * lv) * m;
                 s.energyCostMul -= e.costReducePerLevel * lv;
+                if (e.passive != null) e.passive.Modify(ref s, r, r.tier[i]);
             }
             // 装備統一ボーナス: 4部位すべてが同じエリアの装備(初期装備は対象外)
             AreaData area = null; bool set = true;

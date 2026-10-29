@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99522ea16bf8375498110baf7bdc0389, type: 3}
   m_Name: Ability_SteamBoost
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.SteamBoostAbility
-  displayName: "\u30B9\u30C1\u30FC\u30E0\u30FB\u30D6\u30FC\u30B9\u30C8"
+  displayName: "\u30B9\u30C1\u30FC\u30E0\u30FB\u30B8\u30E3\u30F3\u30D7"
   element: 1
   energyCost: 30
   cooldown: 0.8
   icon: {fileID: 0}
   boostSpeed: 14
   radius: 1.5
+  damageMul: 1
