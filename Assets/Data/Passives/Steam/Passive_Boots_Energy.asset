@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35fab160817219e48af0be1e04dc5c38, type: 3}
   m_Name: Passive_Boots_Energy
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.EnergyOnMaterialPassive
-  displayName: 
+  displayName: "\u88DC\u7D66\u306E\u5FC3\u5F97"
   needBase: 6
   minNeed: 2
   restore: 20

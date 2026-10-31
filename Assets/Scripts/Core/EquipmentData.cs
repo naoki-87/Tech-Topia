@@ -17,6 +17,8 @@ namespace SteamEngineer
         public float energyMaxBase, energyMaxPerLevel;     // 胴: 最大エネルギー
         public float regenBase, regenPerLevel;             // 胴: 回復量
         public float costReducePerLevel;                   // 脚: 消費量の減少(0.04 = 1レベルで4%減)
+        [Header("Default bonus (装備固有のデフォルト性能)")]
+        public float jumpBonus, moveBonus;      // 0.04 = +4%(ティア倍率は掛けない)
         [Header("Ability")]
         public AbilityBase ability;
         public PassiveBase passive;

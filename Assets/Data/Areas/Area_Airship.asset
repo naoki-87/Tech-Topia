@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 406f0847adb0375419a250c4b128cee4, type: 3}
+  m_Name: Area_Airship
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.AreaData
+  displayName: "\u7121\u4EBA\u306E\u98DB\u884C\u8239"
+  materialName: "\u7834\u308C\u305F\u5E06\u5E03"
+  themeColor: {r: 1, g: 1, b: 1, a: 1}
+  icon: {fileID: 0}
+  stagePrefabs:
+  - {fileID: 2249422712772704470, guid: 11f5bc61e1b6a9e4581e71603dfe5a98, type: 3}
+  - {fileID: 7701203653792088367, guid: de5febdbf0a1a9545a6d370a071ca2e6, type: 3}
+  - {fileID: 1129194210873380709, guid: ade51a61113433d49a2b4459b476843b, type: 3}
+  - {fileID: 6474108133319658511, guid: ef64ce2dce1e11e4c8f610cbb026f767, type: 3}
+  bossStagePrefab: {fileID: 5157806685113256585, guid: 9bd93fafd16e7954eb3d8eace5053b38, type: 3}
+  craftable:
+  - {fileID: 11400000, guid: 3c26fcbe8fb702b4e831d9376db67e04, type: 2}
+  - {fileID: 11400000, guid: ab015ae3e1d1c074eb66c40de5810247, type: 2}
+  - {fileID: 11400000, guid: decd27295a10c5f4c902b286286a0c62, type: 2}
+  - {fileID: 11400000, guid: af9ee009c0f5e814ca8fe4c7e30ca80c, type: 2}
+  requiredRank: 0

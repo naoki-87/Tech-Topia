@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2850ef6d32b879d449c973ee35420dfb, type: 3}
   m_Name: Passive_Suit_Heal
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.HealOnMaterialPassive
-  displayName: 
+  displayName: "\u4FEE\u7E55\u306E\u5FC3\u5F97"
   needBase: 12
   minNeed: 4
   healAmount: 1

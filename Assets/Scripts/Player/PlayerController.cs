@@ -1,8 +1,6 @@
 using UnityEngine; using UnityEngine.InputSystem;
 namespace SteamEngineer
 {
-    // Unity 6 + Input System。Player prefab: Rigidbody2D / Collider2D / Health / このスクリプト
-    // 子オブジェクト: GroundCheck(足元), AttackPoint(前方)。Layerは Inspector で設定。
     [RequireComponent(typeof(Rigidbody2D), typeof(Health))]
     public class PlayerController : MonoBehaviour
     {
@@ -11,36 +9,34 @@ namespace SteamEngineer
         public Vector2 groundBox = new Vector2(0.5f, 0.1f), attackBox = new Vector2(1.2f, 0.9f);
         public float moveSpeed = 6f, jumpSpeed = 12f, gravity = 3f, dashSpeed = 16f, dashTime = 0.15f;
         public float coyoteTime = 0.1f, jumpBuffer = 0.12f, attackCooldown = 0.25f, hurtInvuln = 1f;
-        public Health Health { get; private set; } public PlayerStats Stats { get; private set; }
         public float dashCost = 25f, airJumpCost = 20f;
-        Energy energy;
-        AbilityBase ability; float abilityCd;
-        public Rigidbody2D Body => rb;
-        public int Facing => facing;
+        public Health Health { get; private set; } public PlayerStats Stats { get; private set; }
+        public Rigidbody2D Body => rb; public int Facing => facing;
         public int CurrentAttack => Stats.attack + GameManager.Instance.Run.AttackBonus();
-        public void DamageAround(Vector2 center, float radius, int dmg)
-        {
-            foreach (var c in Physics2D.OverlapCircleAll(center, radius))
-                if (c.GetComponent<EnemyBase>() != null && c.TryGetComponent(out Health h)) h.Damage(dmg);
-        }
-        Rigidbody2D rb; int facing = 1, jumpsUsed; float coyote, buffer, dashT, dashCd, atkCd; bool grounded, dashing;
+
+        Rigidbody2D rb; Energy energy;
+        int facing = 1, jumpsUsed; float coyote, buffer, dashT, dashCd, atkCd, pushReadyAt;
+        bool grounded, dashing;
+        readonly AbilityBase[] abilities = new AbilityBase[RunState.Slots];   // 0頭(I) 1胴(O) 2脚(P) 3武器(L)
+        readonly float[] abilityCd = new float[RunState.Slots];
+        Vector2 windPush; float windHold, windMaxRise = 8f;
 
         void Awake()
         {
             rb = GetComponent<Rigidbody2D>(); Health = GetComponent<Health>();
-            energy = GetComponent<Energy>(); if (energy == null) energy = gameObject.AddComponent<Energy>();   // 付け忘れ対策
+            energy = GetComponent<Energy>(); if (energy == null) energy = gameObject.AddComponent<Energy>();
             rb.gravityScale = gravity; rb.freezeRotation = true;
         }
         void Start()
         {
             var run = GameManager.Instance.Run; Stats = PlayerStats.Build(run);
-            energy.Init(Stats.maxEnergy, Stats.energyRegen);
-            energy.costMul = Stats.energyCostMul;
-            ability = FindAbility(run);
+            energy.Init(Stats.maxEnergy, Stats.energyRegen); energy.costMul = Stats.energyCostMul;
+            for (int i = 0; i < RunState.Slots; i++) { var e = run.equipped[i]; abilities[i] = e != null ? e.ability : null; }
             Health.invulnTime = hurtInvuln; Health.Set(run.hp, Stats.maxHp);
             Health.damageModifier = d => Mathf.Max(1, Mathf.RoundToInt(d * (1f - Stats.dmgReduction)));
             Health.Died += () => GameManager.Instance.OnPlayerDead();
         }
+
         void Update()
         {
             var kb = Keyboard.current; if (kb == null || Health.IsDead) return;
@@ -52,12 +48,16 @@ namespace SteamEngineer
             float dt = Time.deltaTime;
 
             grounded = Physics2D.OverlapBox(groundCheck.position, groundBox, 0, groundMask);
-            if (grounded) { coyote = coyoteTime; jumpsUsed = 0; } else coyote -= dt;      // コヨーテタイム
-            buffer = jumpDown ? jumpBuffer : buffer - dt;                                  // 先行入力
-            dashCd -= dt; atkCd -= dt; abilityCd -= dt;
+            if (grounded) { coyote = coyoteTime; jumpsUsed = 0; } else coyote -= dt;
+            buffer = jumpDown ? jumpBuffer : buffer - dt;
+            dashCd -= dt; atkCd -= dt;
+            for (int i = 0; i < abilityCd.Length; i++) abilityCd[i] -= dt;
+            if (windHold > 0f) windHold -= dt; else windPush = Vector2.zero;
             if (x != 0) { facing = x > 0 ? 1 : -1; transform.localScale = new Vector3(facing, 1, 1); }
 
-            if (dash && dashCd <= 0 && !dashing && energy.TryUse(dashCost)) { dashing = true; dashT = dashTime; dashCd = Stats.dashCooldown; rb.gravityScale = 0; Health.GrantInvuln(dashTime); }
+            if (dash && dashCd <= 0 && !dashing && energy.TryUse(dashCost))
+            { dashing = true; dashT = dashTime; dashCd = Stats.dashCooldown; rb.gravityScale = 0; Health.GrantInvuln(dashTime); }
+
             if (dashing)
             {
                 dashT -= dt; rb.linearVelocity = new Vector2(facing * dashSpeed, 0);
@@ -65,58 +65,86 @@ namespace SteamEngineer
             }
             else
             {
-                var v = rb.linearVelocity; v.x = x * moveSpeed;
+                var v = rb.linearVelocity; v.x = x * moveSpeed * Stats.moveMul + windPush.x;
+                if (windPush.y > 0f)                       // 上昇気流: maxRise まで上向きに加速(ジャンプの速さは削らない)
+                {
+                    float before = v.y;
+                    v.y = Mathf.Min(v.y + windPush.y * dt, Mathf.Max(windMaxRise, before));
+                }
+                else if (windPush.y < 0f)                  // 下降気流
+                    v.y = Mathf.Max(v.y + windPush.y * dt, -14f);
                 if (buffer > 0)
                 {
-                    if (coyote > 0) { v.y = jumpSpeed; jumpsUsed = 1; coyote = 0; buffer = 0; }
+                    if (coyote > 0) { v.y = jumpSpeed * Stats.jumpMul; jumpsUsed = 1; coyote = 0; buffer = 0; }
                     else
                     {
-                        if (jumpsUsed == 0) jumpsUsed = 1;                  // 崖から落ちた場合は1回消費済み
-                        if (jumpsUsed < 1 + Stats.extraJumps && energy.TryUse(airJumpCost)) { v.y = jumpSpeed; jumpsUsed++; buffer = 0; }
+                        if (jumpsUsed == 0) jumpsUsed = 1;
+                        if (jumpsUsed < 1 + Stats.extraJumps && energy.TryUse(airJumpCost * Stats.airJumpCostMul))
+                        { v.y = jumpSpeed * Stats.jumpMul; jumpsUsed++; buffer = 0; }
                     }
                 }
-                if (jumpUp && v.y > 0) v.y *= 0.5f;                         // 可変ジャンプ
+                if (jumpUp && v.y > 0) v.y *= 0.5f;
+                if (v.y < -Stats.fallCap) v.y = -Stats.fallCap;                                  // 落下速度の上限(靴の特性)
                 rb.linearVelocity = v;
             }
+
             if (atk && atkCd <= 0) { atkCd = attackCooldown; Attack(); }
 
-            if (kb.lKey.wasPressedThisFrame && ability != null && abilityCd <= 0 && energy.TryUse(ability.energyCost))
+            for (int i = 0; i < RunState.Slots; i++)                                              // 各装備のアクション
             {
-                abilityCd = ability.cooldown; ability.Activate(this);
+                var ab = abilities[i]; if (ab == null || abilityCd[i] > 0f) continue;
+                var key = i == 0 ? kb.iKey : i == 1 ? kb.oKey : i == 2 ? kb.pKey : kb.lKey;
+                if (key.wasPressedThisFrame && energy.TryUse(ab.energyCost)) { abilityCd[i] = ab.cooldown; ab.Activate(this); }
             }
         }
+
         void Attack()
         {
-            foreach (var c in Physics2D.OverlapBoxAll(attackPoint.position, attackBox, 0, hitMask))
+            float m = Stats.attackBoxMul;                                                         // 武器の特性で範囲が広がる
+            Vector2 box = new Vector2(attackBox.x * m, attackBox.y * Mathf.Lerp(1f, m, 0.5f));
+            Vector2 center = (Vector2)attackPoint.position + Vector2.right * facing * (box.x - attackBox.x) * 0.5f;
+            foreach (var c in Physics2D.OverlapBoxAll(center, box, 0, hitMask))
             {
                 if (c.TryGetComponent(out Repairable r)) r.Repair(this);
                 else if (c.TryGetComponent(out Health h) && h != Health) h.Damage(CurrentAttack);
             }
         }
-        public void TakeHit(int dmg, Vector2 from)
+
+        public void TakeHit(int dmg, Vector2 from, bool ranged = false)
         {
-            if (Health.Damage(dmg))
+            if (ranged && Stats.rangedReduction > 0f) dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * (1f - Stats.rangedReduction)));
+            if (!Health.Damage(dmg)) return;
+            var d = ((Vector2)transform.position - from).normalized;
+            rb.linearVelocity = new Vector2(d.x * 6f, 6f); SyncHp();
+            if (!ranged && Stats.pushRadius > 0f && Time.time >= pushReadyAt)                    // 胴体の特性: 近接被弾で吹き飛ばし
             {
-                var d = ((Vector2)transform.position - from).normalized;
-                rb.linearVelocity = new Vector2(d.x * 6f, 6f); SyncHp();
+                pushReadyAt = Time.time + Stats.pushCooldown;
+                foreach (var c in Physics2D.OverlapCircleAll(transform.position, Stats.pushRadius))
+                    if (c.TryGetComponent(out EnemyBase e))
+                        e.Push(new Vector2(Mathf.Sign(e.transform.position.x - transform.position.x), 0.3f).normalized, Stats.pushForce, Stats.pushStun);
             }
         }
+
+        public void SetWind(Vector2 w, float maxRise = 8f)
+        {
+            windPush = w; windMaxRise = maxRise; windHold = 0.08f;
+            if (Stats.windRegen > 0f) energy.Restore(Stats.windRegen * Time.fixedDeltaTime);       // 帽子の特性: 風の中でエネルギー回復
+        }
         public void SyncHp() { GameManager.Instance.Run.hp = Health.Current; }
-        void OnDrawGizmosSelected()
-        {
-            if (groundCheck) Gizmos.DrawWireCube(groundCheck.position, groundBox);
-            if (attackPoint) Gizmos.DrawWireCube(attackPoint.position, attackBox);
-        }
-        AbilityBase FindAbility(RunState r)
-        {
-            int[] order = { (int)EquipSlot.Weapon, (int)EquipSlot.Legs, (int)EquipSlot.Body, (int)EquipSlot.Head };
-            foreach (int i in order) { var e = r.equipped[i]; if (e != null && e.ability != null) return e.ability; }
-            return null;
-        }
         public void EmitElement(Element el, Vector2 center, float radius)
         {
             foreach (var c in Physics2D.OverlapCircleAll(center, radius))
                 if (c.TryGetComponent(out ElementGimmick g)) g.Activate(el);
+        }
+        public void DamageAround(Vector2 center, float radius, int dmg)
+        {
+            foreach (var c in Physics2D.OverlapCircleAll(center, radius))
+                if (c.GetComponent<EnemyBase>() != null && c.TryGetComponent(out Health h)) h.Damage(dmg);
+        }
+        void OnDrawGizmosSelected()
+        {
+            if (groundCheck) Gizmos.DrawWireCube(groundCheck.position, groundBox);
+            if (attackPoint) Gizmos.DrawWireCube(attackPoint.position, attackBox);
         }
     }
 }

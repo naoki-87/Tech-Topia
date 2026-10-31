@@ -741,6 +741,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.GameManager
   allAreas:
   - {fileID: 11400000, guid: c521eb94aadcbbe40be551970fa1c911, type: 2}
+  - {fileID: 11400000, guid: 622625bdb5694af468b53419cb433cb8, type: 2}
   starters:
   - {fileID: 11400000, guid: 274801cd72593254385021e69c76bada, type: 2}
   - {fileID: 11400000, guid: c543e75c2f861754ab3d82c8083e20bb, type: 2}
@@ -749,6 +750,7 @@ MonoBehaviour:
   Save:
     cores: 0
     commonMaterials: 0
+    rank: 0
     baseLevel: 00000000000000000000000000000000
 --- !u!4 &819699637
 Transform:

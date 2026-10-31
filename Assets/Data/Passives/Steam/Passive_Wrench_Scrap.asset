@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceaf9505653137040b3f390ee2e02dc0, type: 3}
   m_Name: Passive_Wrench_Scrap
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.AttackByMaterialPassive
-  displayName: 
+  displayName: "\u5EC3\u6750\u306E\u529B"
   perMaterials: 15
   maxBonus: 6

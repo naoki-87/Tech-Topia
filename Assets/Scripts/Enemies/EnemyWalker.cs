@@ -9,6 +9,7 @@ namespace SteamEngineer
         protected override void Awake() { base.Awake(); rb = GetComponent<Rigidbody2D>(); rb.freezeRotation = true; }
         void FixedUpdate()
         {
+            if (Stunned) return;
             Vector2 p = transform.position;
             bool floor = Physics2D.Raycast(p + new Vector2(dir * edgeCheck, 0), Vector2.down, 1.2f, groundMask);   // 足場の端
             bool wall = Physics2D.Raycast(p, Vector2.right * dir, edgeCheck + 0.1f, groundMask);

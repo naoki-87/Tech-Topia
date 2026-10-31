@@ -8,7 +8,7 @@ namespace SteamEngineer
         public void Launch(Vector2 vel) { GetComponent<Rigidbody2D>().linearVelocity = vel; Destroy(gameObject, life); }
         void OnTriggerEnter2D(Collider2D c)
         {
-            if (c.TryGetComponent(out PlayerController p)) { p.TakeHit(damage, transform.position); Destroy(gameObject); }
+            if (c.TryGetComponent(out PlayerController p)) { p.TakeHit(damage, transform.position, true); Destroy(gameObject); }
             else if (((1 << c.gameObject.layer) & groundMask) != 0) Destroy(gameObject);
         }
     }

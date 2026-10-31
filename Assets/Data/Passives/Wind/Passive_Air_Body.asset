@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af0971463af688d4abca568dd9d048a2, type: 3}
+  m_Name: Passive_Air_Body
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.FeatherBodyPassive
+  displayName: "\u7FBD\u6BDB\u306E\u5B88\u308A"
+  rangedReduction: 0.25
+  pushRadius: 2.5
+  pushForce: 9
+  pushStun: 0.6
+  cooldown: 6

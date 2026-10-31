@@ -34,5 +34,6 @@ namespace SteamEngineer
             var gm = GameManager.Instance; gm.Run.AddStageMaterial(dropAmount * 5); gm.Run.coresCollected++;
             gm.Invoke(nameof(GameManager.OnStageClear), 1.5f); Destroy(gameObject);
         }
+        public override void Push(Vector2 dir, float force, float stun) { }
     }
 }

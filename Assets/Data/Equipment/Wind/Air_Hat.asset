@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24928490dde149e4cb3f061a65e65fcb, type: 3}
+  m_Name: Air_Hat
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.EquipmentData
+  displayName: "\u98A8\u898B\u306E\u5E3D\u5B50"
+  icon: {fileID: 0}
+  slot: 0
+  sourceArea: {fileID: 11400000, guid: 622625bdb5694af468b53419cb433cb8, type: 2}
+  isStarter: 0
+  coreCost: 3
+  commonCost: 5
+  hpBase: 0
+  hpPerLevel: 0
+  dmgRedBase: 0.05
+  dmgRedPerLevel: 0.05
+  attackBase: 0
+  attackPerLevel: 0
+  extraJumps: 0
+  dashCdReductionPerLevel: 0
+  energyMaxBase: 0
+  energyMaxPerLevel: 0
+  regenBase: 0
+  regenPerLevel: 0
+  costReducePerLevel: 0
+  jumpBonus: 0
+  moveBonus: 0
+  ability: {fileID: 0}
+  passive: {fileID: 11400000, guid: a8c2e52a9ec15c54c98d23415f4f45fc, type: 2}
+  evolvesTo: {fileID: 0}
+  evolveLevel: 8

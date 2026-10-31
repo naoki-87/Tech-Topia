@@ -14,8 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.WindBlastAbility
   displayName: "\u30A6\u30A3\u30F3\u30C9\u30FB\u30D6\u30E9\u30B9\u30C8"
   element: 2
-  energyCost: 30
-  cooldown: 0.6
+  energyCost: 35
+  cooldown: 1
   icon: {fileID: 0}
-  reach: 1.5
-  radius: 2.5
+  reach: 2
+  radius: 3
+  force: 12
+  stun: 0.5
+  damageMul: 0.5
