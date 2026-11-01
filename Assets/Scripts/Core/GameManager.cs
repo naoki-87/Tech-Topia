@@ -16,6 +16,8 @@ namespace SteamEngineer
         }
         public void StartRun()
         {
+            if (ExhibitionManager.Instance != null)
+                 Save.commonMaterials = Mathf.Max(Save.commonMaterials, ExhibitionManager.Instance.minCommonMaterials);
             var lv = new int[RunState.Slots];
             for (int i = 0; i < lv.Length; i++) lv[i] = Save.StartLevel(i);
             Run = new RunState(allAreas, starters, Save, lv);

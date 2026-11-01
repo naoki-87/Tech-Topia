@@ -3,7 +3,7 @@ namespace SteamEngineer
 {
     public class RunState
     {
-        public const int Slots = 4, StagesPerArea = 5;
+        public const int Slots = 4, StagesPerArea = 3;
         public EquipmentData[] equipped = new EquipmentData[Slots];
         public Tier[] tier = new Tier[Slots];                 // 部位ごとの現在ティア
         public int[] level = new int[Slots];
