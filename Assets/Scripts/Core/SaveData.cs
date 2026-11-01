@@ -8,6 +8,8 @@ namespace SteamEngineer
         public int commonMaterials;       // 汎用素材
         public int rank;                  // 工房ランク 0=素人 1=職人 2=達人 3=工房 4=伝説
         public int[] baseLevel = new int[4];   // 部位ごとの基礎強化(周回開始時の上限レベル)
+        public int[] startLevel = { -1, -1, -1, -1 };      // 開始レベル(-1 = 基礎レベルと同じ)
+        public int StartLevel(int i) => startLevel[i] < 0 ? baseLevel[i] : Mathf.Min(startLevel[i], baseLevel[i]);
         static string FilePath => Path.Combine(Application.persistentDataPath, "save.json");
         public static SaveData Load()
         {

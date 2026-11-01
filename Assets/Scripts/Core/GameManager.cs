@@ -14,7 +14,13 @@ namespace SteamEngineer
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this; DontDestroyOnLoad(gameObject); Save = SaveData.Load();
         }
-        public void StartRun() { Run = new RunState(allAreas, starters, Save); Run.RollChoices(); Load("AreaSelect"); }
+        public void StartRun()
+        {
+            var lv = new int[RunState.Slots];
+            for (int i = 0; i < lv.Length; i++) lv[i] = Save.StartLevel(i);
+            Run = new RunState(allAreas, starters, Save, lv);
+            Run.RollChoices(); Load("AreaSelect");
+        }
         public void ChooseArea(AreaData a) { Run.BeginArea(a); Load("Stage"); }
         public void OnStageClear()
         {
