@@ -31,6 +31,7 @@ namespace SteamEngineer
         }
         protected override void OnDied()
         {
+            AudioManager.Kill();
             var gm = GameManager.Instance; gm.Run.AddStageMaterial(dropAmount * 5); gm.Run.coresCollected++;
             gm.Invoke(nameof(GameManager.OnStageClear), 1.5f); Destroy(gameObject);
         }

@@ -36,7 +36,7 @@ namespace SteamEngineer
             if (Run.remaining.Count == 0) { EndRun(true); return; }
             Run.RollChoices(); Load("AreaSelect");
         }
-        public void OnPlayerDead() => EndRun(false);
+        public void OnPlayerDead() { AudioManager.GameOver(); EndRun(false); }
         void EndRun(bool win) { Run.Finish(win); Save.Apply(Run, win); Save.Write(); Load("Result"); }
         public void BackToTitle() => Load("Title");
         static void Load(string scene) => SceneManager.LoadScene(scene);

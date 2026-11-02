@@ -56,7 +56,7 @@ namespace SteamEngineer
             if (x != 0) { facing = x > 0 ? 1 : -1; transform.localScale = new Vector3(facing, 1, 1); }
 
             if (dash && dashCd <= 0 && !dashing && energy.TryUse(dashCost))
-            { dashing = true; dashT = dashTime; dashCd = Stats.dashCooldown; rb.gravityScale = 0; Health.GrantInvuln(dashTime); }
+            { dashing = true; dashT = dashTime; dashCd = Stats.dashCooldown; rb.gravityScale = 0; Health.GrantInvuln(dashTime); AudioManager.Dash(); }
 
             if (dashing)
             {
@@ -75,12 +75,21 @@ namespace SteamEngineer
                     v.y = Mathf.Max(v.y + windPush.y * dt, -14f);
                 if (buffer > 0)
                 {
-                    if (coyote > 0) { v.y = jumpSpeed * Stats.jumpMul; jumpsUsed = 1; coyote = 0; buffer = 0; }
+                    if (coyote > 0)
+                    {
+                        v.y = jumpSpeed * Stats.jumpMul; jumpsUsed = 1; coyote = 0; buffer = 0;
+                        AudioManager.Jump();
+                    }
                     else
                     {
                         if (jumpsUsed == 0) jumpsUsed = 1;
-                        if (jumpsUsed < 1 + Stats.extraJumps && energy.TryUse(airJumpCost * Stats.airJumpCostMul))
-                        { v.y = jumpSpeed * Stats.jumpMul; jumpsUsed++; buffer = 0; }
+                        bool canAir = jumpsUsed < 1 + Stats.extraJumps;
+                        if (canAir && energy.TryUse(airJumpCost * Stats.airJumpCostMul))
+                        {
+                            v.y = jumpSpeed * Stats.jumpMul; jumpsUsed++; buffer = 0;
+                            AudioManager.Jump();
+                        }
+                        else Debug.Log($"[空中ジャンプ不可] 回数 {jumpsUsed}/{1 + Stats.extraJumps}  エネルギー {energy.Current:0}");
                     }
                 }
                 if (jumpUp && v.y > 0) v.y *= 0.5f;
@@ -94,12 +103,13 @@ namespace SteamEngineer
             {
                 var ab = abilities[i]; if (ab == null || abilityCd[i] > 0f) continue;
                 var key = i == 0 ? kb.iKey : i == 1 ? kb.oKey : i == 2 ? kb.pKey : kb.lKey;
-                if (key.wasPressedThisFrame && energy.TryUse(ab.energyCost)) { abilityCd[i] = ab.cooldown; ab.Activate(this); }
+                if (key.wasPressedThisFrame && energy.TryUse(ab.energyCost)) { abilityCd[i] = ab.cooldown; ab.Activate(this); AudioManager.Ability(); }
             }
         }
 
         void Attack()
         {
+            AudioManager.Attack();
             float m = Stats.attackBoxMul;                                                         // 武器の特性で範囲が広がる
             Vector2 box = new Vector2(attackBox.x * m, attackBox.y * Mathf.Lerp(1f, m, 0.5f));
             Vector2 center = (Vector2)attackPoint.position + Vector2.right * facing * (box.x - attackBox.x) * 0.5f;
@@ -114,6 +124,7 @@ namespace SteamEngineer
         {
             if (ranged && Stats.rangedReduction > 0f) dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * (1f - Stats.rangedReduction)));
             if (!Health.Damage(dmg)) return;
+            AudioManager.Hurt();
             var d = ((Vector2)transform.position - from).normalized;
             rb.linearVelocity = new Vector2(d.x * 6f, 6f); SyncHp();
             if (!ranged && Stats.pushRadius > 0f && Time.time >= pushReadyAt)                    // 胴体の特性: 近接被弾で吹き飛ばし

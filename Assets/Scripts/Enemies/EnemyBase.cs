@@ -11,7 +11,7 @@ namespace SteamEngineer
 
         protected virtual void Awake() { hp = GetComponent<Health>(); hp.Died += OnDied; }
         protected virtual void Start() { var p = FindFirstObjectByType<PlayerController>(); if (p) player = p.transform; }
-        protected virtual void OnDied() { GameManager.Instance.Run.AddStageMaterial(dropAmount); Destroy(gameObject); }
+        protected virtual void OnDied() { AudioManager.Kill(); GameManager.Instance.Run.AddStageMaterial(dropAmount); Destroy(gameObject); }
 
         // 吹き飛ばし(風・胴体の特性などで使う)。ボスは上書きして無効にする
         public virtual void Push(Vector2 dir, float force, float stun)
