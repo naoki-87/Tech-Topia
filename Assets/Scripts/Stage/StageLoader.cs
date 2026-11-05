@@ -8,6 +8,16 @@ namespace SteamEngineer
         void Start()
         {
             var run = GameManager.Instance.Run; var area = run.current;
+            if (Camera.main != null) { Camera.main.clearFlags = CameraClearFlags.SolidColor; Camera.main.backgroundColor = area.backgroundColor; }
+            if (area.background != null && Camera.main != null)
+            {
+                var go = new GameObject("Background");
+                go.transform.SetParent(Camera.main.transform, false);
+                go.transform.localPosition = new Vector3(0f, 0f, 10f);
+                var sr = go.AddComponent<SpriteRenderer>();
+                sr.sprite = area.background; sr.sortingOrder = -10;
+                go.AddComponent<ParallaxBackground>();
+            }
             var prefab = run.IsBossStage ? area.bossStagePrefab : area.stagePrefabs[Random.Range(0, area.stagePrefabs.Length)];
             Instantiate(prefab);
             var spawn = GameObject.Find("PlayerSpawn");

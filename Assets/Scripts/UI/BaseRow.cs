@@ -21,17 +21,17 @@ namespace SteamEngineer
             h.childControlWidth = true; h.childControlHeight = true;
             h.childForceExpandWidth = false; h.childForceExpandHeight = false;
 
-            Fix(label.gameObject, 560, 56);
-            Fix(spend.gameObject, 190, 56);
+            Fix(label.gameObject, 780, 56);
+            Fix(spend.gameObject, 200, 56);
             Fix(minus.gameObject, 72, 56);
             Fix(plus.gameObject, 72, 56);
 
             label.textWrappingMode = TextWrappingModes.NoWrap;
-            label.fontSize = 30; label.raycastTarget = false;          // ラベルがクリックを邪魔しないようにする
+            label.enableAutoSizing = false; label.fontSize = 32; label.raycastTarget = false;          // ラベルがクリックを邪魔しないようにする
             foreach (var b in new[] { spend, minus, plus })
             {
                 var t = b.GetComponentInChildren<TMP_Text>();
-                if (t) { t.enableAutoSizing = true; t.fontSizeMin = 14; t.fontSizeMax = 28; t.textWrappingMode = TextWrappingModes.NoWrap; t.raycastTarget = false; }
+                if (t) { t.enableAutoSizing = false; t.fontSize = 32; t.textWrappingMode = TextWrappingModes.NoWrap; t.raycastTarget = false; }
             }
         }
     }

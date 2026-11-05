@@ -28,3 +28,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: decd27295a10c5f4c902b286286a0c62, type: 2}
   - {fileID: 11400000, guid: af9ee009c0f5e814ca8fe4c7e30ca80c, type: 2}
   requiredRank: 0
+  backgroundColor: {r: 0.30588236, g: 0.5019608, b: 0.6901961, a: 1}
+  background: {fileID: -8281034327880824709, guid: 8f5d9778924e75b459d564c0105ca370, type: 3}
