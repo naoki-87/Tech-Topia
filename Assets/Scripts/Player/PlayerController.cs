@@ -14,7 +14,7 @@ namespace SteamEngineer
         public Rigidbody2D Body => rb; public int Facing => facing;
         public int CurrentAttack => Stats.attack + GameManager.Instance.Run.AttackBonus();
 
-        Rigidbody2D rb; Energy energy;
+        Rigidbody2D rb; Energy energy; Collider2D col;
         int facing = 1, jumpsUsed; float coyote, buffer, dashT, dashCd, atkCd, pushReadyAt;
         bool grounded, dashing;
         readonly AbilityBase[] abilities = new AbilityBase[RunState.Slots];   // 0頭(I) 1胴(O) 2脚(P) 3武器(L)
@@ -23,7 +23,7 @@ namespace SteamEngineer
 
         void Awake()
         {
-            rb = GetComponent<Rigidbody2D>(); Health = GetComponent<Health>();
+            rb = GetComponent<Rigidbody2D>(); col = GetComponent<Collider2D>(); Health = GetComponent<Health>();
             energy = GetComponent<Energy>(); if (energy == null) energy = gameObject.AddComponent<Energy>();
             rb.gravityScale = gravity; rb.freezeRotation = true;
         }
@@ -47,7 +47,8 @@ namespace SteamEngineer
             bool atk = kb.jKey.wasPressedThisFrame || kb.zKey.wasPressedThisFrame;
             float dt = Time.deltaTime;
 
-            grounded = Physics2D.OverlapBox(groundCheck.position, groundBox, 0, groundMask);
+            var cb = col.bounds;      // コライダーの下端のすぐ下を調べる(GroundCheckの位置に依存しない)
+            grounded = Physics2D.OverlapBox(new Vector2(cb.center.x, cb.min.y - 0.05f), new Vector2(cb.size.x * 0.8f, 0.12f), 0, groundMask);
             if (grounded) { coyote = coyoteTime; jumpsUsed = 0; } else coyote -= dt;
             buffer = jumpDown ? jumpBuffer : buffer - dt;
             dashCd -= dt; atkCd -= dt;
