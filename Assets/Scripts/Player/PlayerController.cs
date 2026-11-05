@@ -15,6 +15,7 @@ namespace SteamEngineer
         public int CurrentAttack => Stats.attack + GameManager.Instance.Run.AttackBonus();
 
         Rigidbody2D rb; Energy energy; Collider2D col;
+        float knockUntil, knockVx;
         int facing = 1, jumpsUsed; float coyote, buffer, dashT, dashCd, atkCd, pushReadyAt;
         bool grounded, dashing;
         readonly AbilityBase[] abilities = new AbilityBase[RunState.Slots];   // 0頭(I) 1胴(O) 2脚(P) 3武器(L)
@@ -48,6 +49,7 @@ namespace SteamEngineer
             float dt = Time.deltaTime;
 
             var cb = col.bounds;      // コライダーの下端のすぐ下を調べる(GroundCheckの位置に依存しない)
+            CheckContact();
             grounded = Physics2D.OverlapBox(new Vector2(cb.center.x, cb.min.y - 0.05f), new Vector2(cb.size.x * 0.8f, 0.12f), 0, groundMask);
             if (grounded) { coyote = coyoteTime; jumpsUsed = 0; } else coyote -= dt;
             buffer = jumpDown ? jumpBuffer : buffer - dt;
@@ -66,7 +68,8 @@ namespace SteamEngineer
             }
             else
             {
-                var v = rb.linearVelocity; v.x = x * moveSpeed * Stats.moveMul + windPush.x;
+                var v = rb.linearVelocity;
+                v.x = Time.time < knockUntil ? knockVx : x * moveSpeed * Stats.moveMul + windPush.x;
                 if (windPush.y > 0f)                       // 上昇気流: maxRise まで上向きに加速(ジャンプの速さは削らない)
                 {
                     float before = v.y;
@@ -126,14 +129,29 @@ namespace SteamEngineer
             if (ranged && Stats.rangedReduction > 0f) dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * (1f - Stats.rangedReduction)));
             if (!Health.Damage(dmg)) return;
             AudioManager.Hurt();
-            var d = ((Vector2)transform.position - from).normalized;
-            rb.linearVelocity = new Vector2(d.x * 6f, 6f); SyncHp();
+            float dirX = transform.position.x >= from.x ? 1f : -1f;      // 敵と反対方向へ軽くのけぞる
+            knockVx = dirX * 5f; knockUntil = Time.time + 0.18f;
+            rb.linearVelocity = new Vector2(knockVx, 6f); SyncHp();
             if (!ranged && Stats.pushRadius > 0f && Time.time >= pushReadyAt)                    // 胴体の特性: 近接被弾で吹き飛ばし
             {
                 pushReadyAt = Time.time + Stats.pushCooldown;
                 foreach (var c in Physics2D.OverlapCircleAll(transform.position, Stats.pushRadius))
                     if (c.TryGetComponent(out EnemyBase e))
                         e.Push(new Vector2(Mathf.Sign(e.transform.position.x - transform.position.x), 0.3f).normalized, Stats.pushForce, Stats.pushStun);
+            }
+        }
+
+        // 自分の体に重なっている敵を調べ、ダメージを受ける(物理的な衝突は不要)
+        void CheckContact()
+        {
+            var b = col.bounds;
+            var hits = Physics2D.OverlapBoxAll(b.center, b.size - new Vector3(0.1f, 0.1f, 0f), 0f);
+            foreach (var h in hits)
+            {
+                var e = h.GetComponentInParent<EnemyBase>();
+                if (e == null) continue;
+                TakeHit(e.contactDamage, e.transform.position);
+                if (Health.IsDead) break;
             }
         }
 

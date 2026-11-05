@@ -26,9 +26,5 @@ namespace SteamEngineer
             float e = 0f;
             while (e < t) { e += Time.deltaTime; transform.position += (Vector3)(v * Time.deltaTime * (1f - e / t)); yield return null; }
         }
-
-        void OnCollisionStay2D(Collision2D c) => Touch(c.collider);
-        void OnTriggerStay2D(Collider2D c) => Touch(c);
-        void Touch(Collider2D c) { if (c.TryGetComponent(out PlayerController p)) p.TakeHit(contactDamage, transform.position); }
     }
 }
