@@ -56,6 +56,7 @@ namespace SteamEngineer
             // ---- 状況表示 ----
             var sb = new StringBuilder();
             sb.AppendLine($"工房ランク {rankNames[save.rank]}  /  HP {run.hp}/{st.maxHp}  /  攻撃力 {st.attack + run.AttackBonus()}  /  エネルギー {st.maxEnergy:0}  /  汎用素材 {save.commonMaterials}");
+            sb.AppendLine($"敵の強さ: HP ×{gm.EnemyHpMul:0.00} / ダメージ +{gm.EnemyDmgBonus}   (装備パワー {run.EquipPower()})");
             for (int s = 0; s < RunState.Slots; s++)
             {
                 var e = run.equipped[s];

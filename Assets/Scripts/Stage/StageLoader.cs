@@ -20,6 +20,7 @@ namespace SteamEngineer
             }
             var prefab = run.IsBossStage ? area.bossStagePrefab : area.stagePrefabs[Random.Range(0, area.stagePrefabs.Length)];
             Instantiate(prefab);
+            Debug.Log($"[難易度] 装備パワー {run.EquipPower()} → 敵HP ×{GameManager.Instance.EnemyHpMul:0.00} / ダメージ +{GameManager.Instance.EnemyDmgBonus}");
             var spawn = GameObject.Find("PlayerSpawn");
             Instantiate(playerPrefab, spawn ? spawn.transform.position : Vector3.zero, Quaternion.identity);
         }

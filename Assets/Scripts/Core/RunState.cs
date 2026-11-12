@@ -84,7 +84,14 @@ namespace SteamEngineer
             for (int i = 0; i < Slots; i++)
                 if (equipped[i] != null && equipped[i].passive != null) equipped[i].passive.OnMaterialGained(this, p, tier[i], gain);
         }
-        public int TotalMaterials() { int s = 0; foreach (var kv in mats) s += kv.Value; return s; }
+        public int TotalMaterials() {int s = 0; foreach (var kv in mats) s += kv.Value; return s;}
+        // 装備の強化度合い: ティア×3 + レベル の合計
+            public int EquipPower()
+            {
+                int p = 0;
+                for (int i = 0; i < Slots; i++) p += 3 * (int)tier[i] + level[i];
+                return p;
+            }
         public int AttackBonus()
         {
             int b = 0;

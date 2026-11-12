@@ -9,6 +9,13 @@ namespace SteamEngineer
         public AreaData[] allAreas;
         public EquipmentData[] starters;     // Head, Body, Legs, Weapon の順
         public SaveData Save; public RunState Run;
+        [Header("敵の強さ(装備の強化度合いで上がる)")]
+        public bool scaleEnemies = true;
+        public float enemyHpPerPower = 0.05f, enemyHpCap = 2.5f;     // パワー1につきHP+5%(最大×2.5)
+        public int enemyDmgStep = 8, enemyDmgMax = 2;                // パワー8ごとにダメージ+1(最大+2)
+
+        public float EnemyHpMul => (!scaleEnemies || Run == null) ? 1f : Mathf.Min(enemyHpCap, 1f + enemyHpPerPower * Run.EquipPower());
+        public int EnemyDmgBonus => (!scaleEnemies || Run == null) ? 0 : Mathf.Min(enemyDmgMax, Run.EquipPower() / Mathf.Max(1, enemyDmgStep));
         void Awake()
         {
             if (Instance != null) { Destroy(gameObject); return; }

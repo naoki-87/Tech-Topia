@@ -10,7 +10,11 @@ namespace SteamEngineer
         public bool Stunned => Time.time < stunUntil;
 
         protected virtual void Awake() { hp = GetComponent<Health>(); hp.Died += OnDied; }
-        protected virtual void Start() { var p = FindFirstObjectByType<PlayerController>(); if (p) player = p.transform; }
+        protected virtual void Start()
+        {
+            var p = FindFirstObjectByType<PlayerController>(); if (p) player = p.transform;
+            var gm = GameManager.Instance; if (gm != null) hp.ScaleMax(gm.EnemyHpMul);
+        }
         protected virtual void OnDied() { AudioManager.Kill(); GameManager.Instance.Run.AddStageMaterial(dropAmount); Destroy(gameObject); }
 
         // 吹き飛ばし(風・胴体の特性などで使う)。ボスは上書きして無効にする

@@ -150,7 +150,7 @@ namespace SteamEngineer
             {
                 var e = h.GetComponentInParent<EnemyBase>();
                 if (e == null) continue;
-                TakeHit(e.contactDamage, e.transform.position);
+                TakeHit(e.contactDamage + GameManager.Instance.EnemyDmgBonus, e.transform.position);
                 if (Health.IsDead) break;
             }
         }
