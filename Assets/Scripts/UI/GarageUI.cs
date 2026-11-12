@@ -118,6 +118,14 @@ namespace SteamEngineer
                     }
                 }
             }
+            // 装備の切り替え(持っている装備)
+            foreach (var kv in run.StashList())
+            {
+                var e = kv.Key; var info = kv.Value; int slot = (int)e.slot;
+                var cur = run.equipped[slot];
+                Add($"切替 {slotNames[slot]}: {(cur ? cur.displayName : "-")} → {e.displayName}[{info.tier.Label()}]Lv{info.level}",
+                    true, () => run.Equip(e)); count++;
+            }
             if (count == 0) Add("(今できる合成・強化・作成はありません)", false, null);
         }
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic; using UnityEngine;
 namespace SteamEngineer
 {
+    public class EquipState { public Tier tier; public int level; }
     public class RunState
     {
         public const int Slots = 4, StagesPerArea = 3;
@@ -12,6 +13,7 @@ namespace SteamEngineer
         public AreaData current;
         public int areasCleared, stageIndex, rerolls = 1, coresCollected, hp;
         public bool won, swapped;
+        public Dictionary<EquipmentData, EquipState> stash = new Dictionary<EquipmentData, EquipState>();   // 持っているが装備していない装備
         public Dictionary<PassiveBase, int> counters = new Dictionary<PassiveBase, int>();
         float matCarry;      // 素材獲得量アップの端数
         public Dictionary<(AreaData, Tier), int> mats = new Dictionary<(AreaData, Tier), int>();
@@ -102,14 +104,40 @@ namespace SteamEngineer
         // ---------- 装備の作成 ----------
         public static int CommonCraft(EquipmentData e, Tier t) => e.commonCost * ((int)t + 1);
         public bool CanCraft(EquipmentData e, Tier t) =>
-            e != null && e.sourceArea != null && t <= MaxCraftTier &&
+            e != null && e.sourceArea != null && !Owns(e) && t <= MaxCraftTier &&
             Mat(e.sourceArea, t) >= e.coreCost && save.commonMaterials >= CommonCraft(e, t);
+
         public bool Craft(EquipmentData e, Tier t)
         {
             if (!CanCraft(e, t)) return false;
             mats[(e.sourceArea, t)] -= e.coreCost; save.commonMaterials -= CommonCraft(e, t);
-            int i = (int)e.slot; equipped[i] = e; tier[i] = t; level[i] = 0; swapped = true;
+            int i = (int)e.slot; Stow(i);                                  // 今の装備は持ち物へ
+            equipped[i] = e; tier[i] = t; level[i] = 0; swapped = true;
             ClampHp(); CheckRankUp(); return true;
+        }
+
+        public bool Owns(EquipmentData e)
+        {
+            if (e == null) return false;
+            foreach (var q in equipped) if (q == e) return true;
+            return stash.ContainsKey(e);
+        }
+        void Stow(int i)
+        {
+            var cur = equipped[i];
+            if (cur != null) stash[cur] = new EquipState { tier = tier[i], level = level[i] };
+        }
+        public bool Equip(EquipmentData e)
+        {
+            if (e == null || !stash.TryGetValue(e, out var st)) return false;
+            int i = (int)e.slot; Stow(i); stash.Remove(e);
+            equipped[i] = e; tier[i] = st.tier; level[i] = st.level; swapped = true;
+            ClampHp(); return true;
+        }
+        public List<KeyValuePair<EquipmentData, EquipState>> StashList()
+        {
+            var l = new List<KeyValuePair<EquipmentData, EquipState>>(stash);
+            l.Sort((a, b) => ((int)a.Key.slot).CompareTo((int)b.Key.slot)); return l;
         }
 
         // ---------- 装備のティア強化(下位装備 + 上位素材) ----------
