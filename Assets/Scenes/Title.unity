@@ -1631,6 +1631,26 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c543e75c2f861754ab3d82c8083e20bb, type: 2}
   - {fileID: 11400000, guid: 3fcacfbd78b89fb42be1cbdafc9b1031, type: 2}
   - {fileID: 11400000, guid: e184ddf7fe80d8b4b9483219663aa26b, type: 2}
+  relicPool:
+  - {fileID: 11400000, guid: 9cda23b47eadf584cb6eba1ec3cdc6f7, type: 2}
+  - {fileID: 11400000, guid: 4dde0f4c54fdf464284cf54558e88a5f, type: 2}
+  - {fileID: 11400000, guid: 23bceab36c76ff64ba704593328e62a1, type: 2}
+  - {fileID: 11400000, guid: 4cd7064245e9709488bd567f53713ab3, type: 2}
+  - {fileID: 11400000, guid: 00b1dfc4001350c4bbd96fec0dc0c737, type: 2}
+  - {fileID: 11400000, guid: 1a70ffd1df172be42aa172017378b497, type: 2}
+  - {fileID: 11400000, guid: 104e410d0009c2246b9ee001910d171f, type: 2}
+  - {fileID: 11400000, guid: 3bd181a3bf5c5784c9483f793ec8a8dd, type: 2}
+  - {fileID: 11400000, guid: c0ca44bbaba9ce14688b083ca03b13eb, type: 2}
+  - {fileID: 11400000, guid: 544f812427dbd584fb3b95eb7362104b, type: 2}
+  - {fileID: 11400000, guid: 2d9daf430dd0b4e49b3b74bb0ae0cb37, type: 2}
+  - {fileID: 11400000, guid: 02714ea803d445749a6e6d18b45e592c, type: 2}
+  visitsPerArea: 2
+  scaleEnemies: 1
+  enemyHpPerPower: 0.05
+  enemyHpCap: 2.5
+  enemyHpPerArea: 0.12
+  enemyDmgStep: 8
+  enemyDmgMax: 2
   Save:
     cores: 0
     commonMaterials: 0
@@ -1665,10 +1685,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.ExhibitionManager
   exhibitionMode: 1
-  idleSeconds: 90
-  resetSaveOnIdle: 1
-  minCommonMaterials: 40
+  resetHoldSeconds: 2
   quitHoldSeconds: 2
+  idleReturnSeconds: 0
+  minCommonMaterials: 40
 --- !u!114 &819699639
 MonoBehaviour:
   m_ObjectHideFlags: 0

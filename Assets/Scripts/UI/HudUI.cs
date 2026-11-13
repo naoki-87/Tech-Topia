@@ -18,7 +18,7 @@ namespace SteamEngineer
                 if (!hp) { var p = FindFirstObjectByType<PlayerController>(); if (p) { hp = p.Health; en = p.GetComponent<Energy>(); } }
                 if (!bossHp) { var b = FindFirstObjectByType<BossController>(); if (b) bossHp = b.GetComponent<Health>(); }
             }
-            if (infoText) infoText.text = (run.current ? run.current.displayName : "") + $"  Stage {run.stageIndex + 1}/{RunState.StagesPerArea}";
+            if (infoText) infoText.text = (run.current ? run.current.displayName : "") + $"  ÉGÉäÉA {run.areasCleared + 1}/{run.totalAreas}  Stage {run.stageIndex + 1}/{RunState.StagesPerArea}";
             if (hp && hpFill) hpFill.fillAmount = (float)hp.Current / hp.max;
             if (en && energyFill) energyFill.fillAmount = en.Current / en.max;
             bool boss = bossHp && !bossHp.IsDead;

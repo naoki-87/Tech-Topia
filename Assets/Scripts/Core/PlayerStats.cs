@@ -34,6 +34,18 @@ namespace SteamEngineer
                 s.jumpMul += e.jumpBonus; s.moveMul += e.moveBonus;
                 if (e.passive != null) e.passive.Modify(ref s, r, r.tier[i]);
             }
+            foreach (var rl in r.relics)
+            switch (rl.effect)
+            {
+                case RelicEffect.MaxHp: s.maxHp += Mathf.RoundToInt(rl.value); break;
+                case RelicEffect.MaxEnergy: s.maxEnergy += rl.value; break;
+                case RelicEffect.EnergyRegen: s.energyRegen += rl.value; break;
+                case RelicEffect.Attack: s.attack += Mathf.RoundToInt(rl.value); break;
+                case RelicEffect.DamageReduction: s.dmgReduction += rl.value; break;
+                case RelicEffect.AirJumpCost: s.airJumpCostMul -= rl.value; break;
+                case RelicEffect.MoveSpeed: s.moveMul += rl.value; break;
+                case RelicEffect.JumpPower: s.jumpMul += rl.value; break;
+            }
             // 装備統一ボーナス: 4部位すべてが同じエリアの装備(初期装備は対象外)
             AreaData area = null; bool set = true;
             for (int i = 0; i < RunState.Slots; i++)

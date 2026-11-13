@@ -57,6 +57,7 @@ namespace SteamEngineer
             var sb = new StringBuilder();
             sb.AppendLine($"工房ランク {rankNames[save.rank]}  /  HP {run.hp}/{st.maxHp}  /  攻撃力 {st.attack + run.AttackBonus()}  /  エネルギー {st.maxEnergy:0}  /  汎用素材 {save.commonMaterials}");
             sb.AppendLine($"敵の強さ: HP ×{gm.EnemyHpMul:0.00} / ダメージ +{gm.EnemyDmgBonus}   (装備パワー {run.EquipPower()})");
+            if (run.relics.Count > 0) sb.AppendLine("遺物: " + string.Join(" / ", run.relics.ConvertAll(x => x.displayName)));
             for (int s = 0; s < RunState.Slots; s++)
             {
                 var e = run.equipped[s];
@@ -83,6 +84,11 @@ namespace SteamEngineer
             // ---- 操作リスト ----
             foreach (Transform c in listRoot) Destroy(c.gameObject);
             int count = 0;
+            foreach (var rl in new System.Collections.Generic.List<RelicData>(run.relicOffers))
+            {
+                var relic = rl;
+                Add($"【遺物を1つ選ぶ】{relic.displayName}\n{relic.description}", true, () => run.TakeRelic(relic)); count++;
+            }
 
             // 素材の合成
             foreach (var a in gm.allAreas)
@@ -128,6 +134,7 @@ namespace SteamEngineer
                     true, () => run.Equip(e)); count++;
             }
             if (count == 0) Add("(今できる合成・強化・作成はありません)", false, null);
+            departButton.interactable = run.relicOffers.Count == 0;       // 遺物を選ぶまで出発できない
         }
 
 #if UNITY_EDITOR

@@ -2,34 +2,42 @@ using System.Collections.Generic; using UnityEngine;
 namespace SteamEngineer
 {
     public class EquipState { public Tier tier; public int level; }
+
     public class RunState
     {
-        public const int Slots = 4, StagesPerArea = 3;
+        public const int Slots = 4, StagesPerArea = 3;      // 展示用は3。変更していた場合は、その値にする
+        const float PlayedWeight = 0.03f;                    // 遊んだステージの抽選の重み(通常は1)
+
         public EquipmentData[] equipped = new EquipmentData[Slots];
-        public Tier[] tier = new Tier[Slots];                 // 部位ごとの現在ティア
+        public Tier[] tier = new Tier[Slots];
         public int[] level = new int[Slots];
         public List<AreaData> remaining, choices = new List<AreaData>();
         public List<GameObject> stageOrder = new List<GameObject>();
+        public HashSet<GameObject> playedStages = new HashSet<GameObject>();
+        public Dictionary<AreaData, int> visits = new Dictionary<AreaData, int>();
         public AreaData current;
-        public int areasCleared, stageIndex, rerolls = 1, coresCollected, hp;
-        public bool won, swapped;
-        public Dictionary<EquipmentData, EquipState> stash = new Dictionary<EquipmentData, EquipState>();   // 持っているが装備していない装備
-        public Dictionary<PassiveBase, int> counters = new Dictionary<PassiveBase, int>();
-        float matCarry;      // 素材獲得量アップの端数
+        public int areasCleared, totalAreas, stageIndex, stagesCleared, rerolls = 1, coresCollected, hp;
+        public bool won, swapped, reviveUsed;
         public Dictionary<(AreaData, Tier), int> mats = new Dictionary<(AreaData, Tier), int>();
+        public Dictionary<EquipmentData, EquipState> stash = new Dictionary<EquipmentData, EquipState>();
+        public Dictionary<PassiveBase, int> counters = new Dictionary<PassiveBase, int>();
+        public List<RelicData> relics = new List<RelicData>(), relicOffers = new List<RelicData>();
+        float matCarry;
         readonly SaveData save;
 
         public int Rank => save.rank;
         public bool IsBossStage => stageIndex == StagesPerArea - 1;
-        // 作成・強化・合成できる最大ティア = ランク+1
         public Tier MaxCraftTier => (Tier)Mathf.Min(4, save.rank + 1);
-        // 進行度で決まるドロップティアを、解放済みの範囲に抑える
-        public Tier DropTier => (Tier)Mathf.Min(Mathf.Min(4, areasCleared * 5 / 6), (int)MaxCraftTier);
+        // 進行度でドロップのティアが上がる(4エリアで 0→3)。解放済みの範囲に抑える
+        public Tier DropTier => (Tier)Mathf.Min(Mathf.Min(4, areasCleared * 4 / Mathf.Max(1, totalAreas)), (int)MaxCraftTier);
 
-        public RunState(AreaData[] all, EquipmentData[] starters, SaveData save, int[] startLevels = null)
+        public RunState(AreaData[] all, EquipmentData[] starters, SaveData save, int[] startLevels = null, int visitsPerArea = 1)
         {
             this.save = save; remaining = new List<AreaData>();
-            foreach (var a in all) if (a != null && a.requiredRank <= save.rank) remaining.Add(a);   // ランクで解放
+            foreach (var a in all)
+                if (a != null && a.requiredRank <= save.rank)
+                    for (int v = 0; v < Mathf.Max(1, visitsPerArea); v++) remaining.Add(a);    // エリアを複数回使う
+            totalAreas = remaining.Count;
             for (int i = 0; i < Slots; i++)
             {
                 equipped[i] = starters[i]; tier[i] = Tier.Crude;
@@ -40,13 +48,16 @@ namespace SteamEngineer
         }
 
         // ---------- エリア選択 ----------
+        public int Visits(AreaData a) => visits.TryGetValue(a, out var v) ? v : 0;
         public void RollChoices()
         {
-            choices.Clear(); var pool = new List<AreaData>(remaining);
+            choices.Clear(); var pool = new List<AreaData>();
+            foreach (var a in remaining) if (!pool.Contains(a)) pool.Add(a);          // 同じエリアは1枚にまとめる
             for (int i = 0; i < 3 && pool.Count > 0; i++) { int k = Random.Range(0, pool.Count); choices.Add(pool[k]); pool.RemoveAt(k); }
         }
         public bool Reroll() { if (rerolls <= 0) return false; rerolls--; RollChoices(); return true; }
 
+        // 通常ステージの抽選: 遊んだステージは重みを大きく下げる。全部遊んだら記録をリセットする
         public void BeginArea(AreaData a)
         {
             current = a; stageIndex = 0; stageOrder.Clear();
@@ -54,44 +65,39 @@ namespace SteamEngineer
             foreach (var p in a.stagePrefabs) if (p != null && p != a.bossStagePrefab) pool.Add(p);
             if (pool.Count == 0) { Debug.LogError("Stage Prefabs が空です: " + a.name); return; }
             int need = StagesPerArea - 1;
-            while (stageOrder.Count < need)
+            for (int n = 0; n < need; n++)
             {
-                var bag = new List<GameObject>(pool);
-                for (int i = bag.Count - 1; i > 0; i--) { int j = Random.Range(0, i + 1); (bag[i], bag[j]) = (bag[j], bag[i]); }
-                if (stageOrder.Count > 0 && bag.Count > 1 && bag[0] == stageOrder[stageOrder.Count - 1]) (bag[0], bag[1]) = (bag[1], bag[0]);
-                foreach (var b in bag) { if (stageOrder.Count >= need) break; stageOrder.Add(b); }
+                bool all = true; foreach (var p in pool) if (!playedStages.Contains(p)) { all = false; break; }
+                if (all) foreach (var p in pool) playedStages.Remove(p);
+                var w = new float[pool.Count]; float total = 0f;
+                for (int i = 0; i < pool.Count; i++) { w[i] = playedStages.Contains(pool[i]) ? PlayedWeight : 1f; total += w[i]; }
+                float r = Random.value * total; int pick = pool.Count - 1;
+                for (int i = 0; i < pool.Count; i++) { r -= w[i]; if (r <= 0f) { pick = i; break; } }
+                stageOrder.Add(pool[pick]); playedStages.Add(pool[pick]);
             }
         }
         public GameObject CurrentStagePrefab => IsBossStage ? current.bossStagePrefab : stageOrder[stageIndex];
-        public void CompleteArea() { remaining.Remove(current); current = null; areasCleared++; }
+        public void CompleteArea() { visits[current] = Visits(current) + 1; remaining.Remove(current); current = null; areasCleared++; }
 
         // ---------- 素材 ----------
         public void AddStageMaterial(int n)
         {
             if (current == null) return;
-            float bonus = 0f;
+            float bonus = RelicValue(RelicEffect.Greed);
             for (int i = 0; i < Slots; i++)
                 if (equipped[i] != null && equipped[i].passive != null) bonus += equipped[i].passive.MatGainBonus(tier[i]);
-            matCarry += n * (1f + bonus);                                   // 端数は持ち越す
+            matCarry += n * (1f + bonus);
             int gain = Mathf.FloorToInt(matCarry + 0.0001f);
             matCarry = Mathf.Max(0f, matCarry - gain);
             if (gain <= 0) return;
-
             var k = (current, DropTier);
             mats[k] = (mats.TryGetValue(k, out var v) ? v : 0) + gain;
-
-            var p = Object.FindFirstObjectByType<PlayerController>();      // ステージ中のみ存在する
+            var p = Object.FindFirstObjectByType<PlayerController>();
             for (int i = 0; i < Slots; i++)
                 if (equipped[i] != null && equipped[i].passive != null) equipped[i].passive.OnMaterialGained(this, p, tier[i], gain);
         }
-        public int TotalMaterials() {int s = 0; foreach (var kv in mats) s += kv.Value; return s;}
-        // 装備の強化度合い: ティア×3 + レベル の合計
-            public int EquipPower()
-            {
-                int p = 0;
-                for (int i = 0; i < Slots; i++) p += 3 * (int)tier[i] + level[i];
-                return p;
-            }
+        public int Mat(AreaData a, Tier t) => mats.TryGetValue((a, t), out var v) ? v : 0;
+        public int TotalMaterials() { int s = 0; foreach (var kv in mats) s += kv.Value; return s; }
         public int AttackBonus()
         {
             int b = 0;
@@ -99,35 +105,32 @@ namespace SteamEngineer
                 if (equipped[i] != null && equipped[i].passive != null) b += equipped[i].passive.AttackBonus(this, tier[i]);
             return b;
         }
-        public int Mat(AreaData a, Tier t) => mats.TryGetValue((a, t), out var v) ? v : 0;
+        public int EquipPower() { int p = 0; for (int i = 0; i < Slots; i++) p += 3 * (int)tier[i] + level[i]; return p; }
 
-        // 同種素材3つ → 1段階上位の素材(解放済みティアまで)
         public bool Fuse(AreaData a, Tier t)
         {
             if (t >= MaxCraftTier || Mat(a, t) < 3) return false;
             mats[(a, t)] -= 3; mats[(a, t + 1)] = Mat(a, t + 1) + 1; return true;
         }
 
-        // ---------- 装備の作成 ----------
+        // ---------- 装備の作成・切り替え ----------
         public static int CommonCraft(EquipmentData e, Tier t) => e.commonCost * ((int)t + 1);
-        public bool CanCraft(EquipmentData e, Tier t) =>
-            e != null && e.sourceArea != null && !Owns(e) && t <= MaxCraftTier &&
-            Mat(e.sourceArea, t) >= e.coreCost && save.commonMaterials >= CommonCraft(e, t);
-
-        public bool Craft(EquipmentData e, Tier t)
-        {
-            if (!CanCraft(e, t)) return false;
-            mats[(e.sourceArea, t)] -= e.coreCost; save.commonMaterials -= CommonCraft(e, t);
-            int i = (int)e.slot; Stow(i);                                  // 今の装備は持ち物へ
-            equipped[i] = e; tier[i] = t; level[i] = 0; swapped = true;
-            ClampHp(); CheckRankUp(); return true;
-        }
-
         public bool Owns(EquipmentData e)
         {
             if (e == null) return false;
             foreach (var q in equipped) if (q == e) return true;
             return stash.ContainsKey(e);
+        }
+        public bool CanCraft(EquipmentData e, Tier t) =>
+            e != null && e.sourceArea != null && !Owns(e) && t <= MaxCraftTier &&
+            Mat(e.sourceArea, t) >= e.coreCost && save.commonMaterials >= CommonCraft(e, t);
+        public bool Craft(EquipmentData e, Tier t)
+        {
+            if (!CanCraft(e, t)) return false;
+            mats[(e.sourceArea, t)] -= e.coreCost; save.commonMaterials -= CommonCraft(e, t);
+            int i = (int)e.slot; Stow(i);
+            equipped[i] = e; tier[i] = t; level[i] = 0; swapped = true;
+            ClampHp(); CheckRankUp(); return true;
         }
         void Stow(int i)
         {
@@ -147,7 +150,7 @@ namespace SteamEngineer
             l.Sort((a, b) => ((int)a.Key.slot).CompareTo((int)b.Key.slot)); return l;
         }
 
-        // ---------- 装備のティア強化(下位装備 + 上位素材) ----------
+        // ---------- ティア強化 ----------
         public int UpgradeCore(EquipmentData e) => Mathf.Max(1, e.coreCost - 1);
         public static int CommonUpgrade(EquipmentData e, Tier next) => Mathf.Max(1, e.commonCost * ((int)next + 1) / 2);
         public bool CanUpgradeTier(int slot)
@@ -166,7 +169,6 @@ namespace SteamEngineer
         }
 
         // ---------- 工房ランク ----------
-        // 「次のティア」の装備を4部位そろえた時にランクアップ(例: 凡作一式 → 職人)
         void CheckRankUp()
         {
             bool up = false;
@@ -181,13 +183,32 @@ namespace SteamEngineer
         }
         void ClampHp() { hp = Mathf.Min(hp, PlayerStats.Build(this).maxHp); }
 
-        // ---------- レベル強化(ガレージの3択) ----------
         public void Upgrade(EquipSlot s)
         {
             int i = (int)s; level[i]++;
-            var e = equipped[i];   // 初期装備を交換せず十分強化すると進化
+            var e = equipped[i];
             if (e != null && e.isStarter && e.evolvesTo != null && !swapped && level[i] >= e.evolveLevel) equipped[i] = e.evolvesTo;
         }
+
+        // ---------- 遺物 ----------
+        public void OfferRelics(RelicData[] pool, int n = 3)
+        {
+            relicOffers.Clear(); if (pool == null) return;
+            var cand = new List<RelicData>();
+            foreach (var p in pool) if (p != null && !relics.Contains(p)) cand.Add(p);
+            for (int i = 0; i < n && cand.Count > 0; i++) { int k = Random.Range(0, cand.Count); relicOffers.Add(cand[k]); cand.RemoveAt(k); }
+        }
+        public bool TakeRelic(RelicData r)
+        {
+            if (r == null || !relicOffers.Contains(r)) return false;
+            relics.Add(r); relicOffers.Clear();
+            if (r.effect == RelicEffect.MaxHp) hp += Mathf.RoundToInt(r.value);       // 最大HPが増えた分、HPも増やす
+            return true;
+        }
+        public bool HasRelic(RelicEffect e) { foreach (var r in relics) if (r.effect == e) return true; return false; }
+        public float RelicValue(RelicEffect e) { float s = 0f; foreach (var r in relics) if (r.effect == e) s += r.value; return s; }
+        public float RelicValue2(RelicEffect e) { float s = 0f; foreach (var r in relics) if (r.effect == e) s += r.value2; return s; }
+
         public void Finish(bool win) { won = win; }
     }
 }

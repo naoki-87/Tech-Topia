@@ -16,6 +16,11 @@ namespace SteamEngineer
             max = m; Current = m; Changed?.Invoke(Current, max);
         }
         public void Heal(int a) { if (IsDead) return; Current = Mathf.Min(max, Current + a); Changed?.Invoke(Current, max); }
+        public void Revive(int hp)
+        {
+            IsDead = false; Current = Mathf.Clamp(hp, 1, max); GrantInvuln(2f);
+            Changed?.Invoke(Current, max);
+        }
         public void GrantInvuln(float t) { invUntil = Mathf.Max(invUntil, Time.time + t); }
         public bool Damage(int amount)
         {

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63c5a3879bdc6df43852fb6c4bfcab78, type: 3}
+  m_Name: Relic_Kit
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.RelicData
+  displayName: "\u7DCA\u6025\u4FEE\u7406\u30AD\u30C3\u30C8"
+  description: "HP\u304C0\u306B\u306A\u3063\u305F\u3068\u304D\u30011\u56DE\u3060\u3051HP3\u3067\u5FA9\u6D3B"
+  effect: 10
+  value: 3
+  value2: 0
+  icon: {fileID: 0}

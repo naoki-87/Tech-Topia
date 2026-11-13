@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63c5a3879bdc6df43852fb6c4bfcab78, type: 3}
+  m_Name: Relic_Armor
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.RelicData
+  displayName: "\u92FC\u306E\u5916\u88C5"
+  description: "\u53D7\u3051\u308B\u30C0\u30E1\u30FC\u30B8 -10%"
+  effect: 4
+  value: 0.1
+  value2: 0
+  icon: {fileID: 0}

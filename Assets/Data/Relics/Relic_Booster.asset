@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63c5a3879bdc6df43852fb6c4bfcab78, type: 3}
+  m_Name: Relic_Booster
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.RelicData
+  displayName: "\u84B8\u6C17\u30D6\u30FC\u30B9\u30BF\u30FC"
+  description: "\u30A8\u30CD\u30EB\u30AE\u30FC\u56DE\u5FA9 +8/\u79D2"
+  effect: 2
+  value: 8
+  value2: 0
+  icon: {fileID: 0}

@@ -12,7 +12,8 @@ namespace SteamEngineer
         public float dashCost = 25f, airJumpCost = 20f;
         public Health Health { get; private set; } public PlayerStats Stats { get; private set; }
         public Rigidbody2D Body => rb; public int Facing => facing;
-        public int CurrentAttack => Stats.attack + GameManager.Instance.Run.AttackBonus();
+        public int CurrentAttack => Stats.attack + GameManager.Instance.Run.AttackBonus() + LowHpBonus;
+        int LowHpBonus => (Health != null && Health.Current * 2 <= Health.max) ? Mathf.RoundToInt(GameManager.Instance.Run.RelicValue(RelicEffect.LowHpAttack)) : 0;
 
         Rigidbody2D rb; Energy energy; Collider2D col;
         float knockUntil, knockVx;
@@ -35,7 +36,7 @@ namespace SteamEngineer
             for (int i = 0; i < RunState.Slots; i++) { var e = run.equipped[i]; abilities[i] = e != null ? e.ability : null; }
             Health.invulnTime = hurtInvuln; Health.Set(run.hp, Stats.maxHp);
             Health.damageModifier = d => Mathf.Max(1, Mathf.RoundToInt(d * (1f - Stats.dmgReduction)));
-            Health.Died += () => GameManager.Instance.OnPlayerDead();
+            Health.Died += () => { if (!TryRevive()) GameManager.Instance.OnPlayerDead(); };
         }
 
         void Update()
@@ -161,6 +162,14 @@ namespace SteamEngineer
             if (Stats.windRegen > 0f) energy.Restore(Stats.windRegen * Time.fixedDeltaTime);       // 帽子の特性: 風の中でエネルギー回復
         }
         public void SyncHp() { GameManager.Instance.Run.hp = Health.Current; }
+        bool TryRevive()
+        {
+            var run = GameManager.Instance.Run;
+            if (run.reviveUsed || !run.HasRelic(RelicEffect.Revive)) return false;
+            run.reviveUsed = true;
+            Health.Revive(Mathf.RoundToInt(run.RelicValue(RelicEffect.Revive))); SyncHp();
+            return true;
+        }
         public void EmitElement(Element el, Vector2 center, float radius)
         {
             foreach (var c in Physics2D.OverlapCircleAll(center, radius))

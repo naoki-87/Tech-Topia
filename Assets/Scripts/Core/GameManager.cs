@@ -2,39 +2,62 @@ using UnityEngine; using UnityEngine.SceneManagement;
 namespace SteamEngineer
 {
     // Title シーンに1つ置く。DontDestroyOnLoad。
-    // Scenes: Title / AreaSelect / Stage / Garage / Result  (Build Settingsに登録)
+    // Scenes: Title / AreaSelect / Stage / Garage / Result
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance;
         public AreaData[] allAreas;
         public EquipmentData[] starters;     // Head, Body, Legs, Weapon の順
-        public SaveData Save; public RunState Run;
-        [Header("敵の強さ(装備の強化度合いで上がる)")]
+        public RelicData[] relicPool;        // 遺物の候補(Tools > TechTopia > 遺物アセットを作成 で自動設定)
+        [Header("1周の長さ")]
+        public int visitsPerArea = 2;        // 各エリアを何回使うか(2エリア × 2 = 4エリア)
+        [Header("敵の強さ")]
         public bool scaleEnemies = true;
-        public float enemyHpPerPower = 0.05f, enemyHpCap = 2.5f;     // パワー1につきHP+5%(最大×2.5)
-        public int enemyDmgStep = 8, enemyDmgMax = 2;                // パワー8ごとにダメージ+1(最大+2)
+        public float enemyHpPerPower = 0.05f, enemyHpCap = 2.5f, enemyHpPerArea = 0.12f;
+        public int enemyDmgStep = 8, enemyDmgMax = 2;
+        public SaveData Save; public RunState Run;
 
-        public float EnemyHpMul => (!scaleEnemies || Run == null) ? 1f : Mathf.Min(enemyHpCap, 1f + enemyHpPerPower * Run.EquipPower());
+        public float EnemyHpMul
+        {
+            get
+            {
+                if (Run == null) return 1f;
+                float m = 1f;
+                if (scaleEnemies)
+                {
+                    m = Mathf.Min(enemyHpCap, 1f + enemyHpPerPower * Run.EquipPower());   // 装備の強化度合い
+                    m *= 1f + enemyHpPerArea * Run.areasCleared;                           // 攻略したエリアの数
+                }
+                return m * (1f + Run.RelicValue2(RelicEffect.Greed));                      // 強欲な歯車
+            }
+        }
         public int EnemyDmgBonus => (!scaleEnemies || Run == null) ? 0 : Mathf.Min(enemyDmgMax, Run.EquipPower() / Mathf.Max(1, enemyDmgStep));
+
         void Awake()
         {
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this; DontDestroyOnLoad(gameObject); Save = SaveData.Load();
         }
+
         public void StartRun()
         {
             if (ExhibitionManager.Instance != null)
-                 Save.commonMaterials = Mathf.Max(Save.commonMaterials, ExhibitionManager.Instance.minCommonMaterials);
+                Save.commonMaterials = Mathf.Max(Save.commonMaterials, ExhibitionManager.Instance.minCommonMaterials);
             var lv = new int[RunState.Slots];
             for (int i = 0; i < lv.Length; i++) lv[i] = Save.StartLevel(i);
-            Run = new RunState(allAreas, starters, Save, lv);
+            Run = new RunState(allAreas, starters, Save, lv, visitsPerArea);
             Run.RollChoices(); Load("AreaSelect");
         }
         public void ChooseArea(AreaData a) { Run.BeginArea(a); Load("Stage"); }
+
         public void OnStageClear()
         {
-            Run.stageIndex++;
+            AudioManager.Clear();
+            bool wasBoss = Run.IsBossStage;
+            Run.stagesCleared++; Run.stageIndex++;
             if (Run.stageIndex >= RunState.StagesPerArea) Run.CompleteArea();
+            // 遺物の提示: 最初のステージのあと、最終以外のボスのあと
+            if (Run.stagesCleared == 1 || (wasBoss && Run.remaining.Count > 0)) Run.OfferRelics(relicPool);
             Load("Garage");
         }
         public void AfterGarage()

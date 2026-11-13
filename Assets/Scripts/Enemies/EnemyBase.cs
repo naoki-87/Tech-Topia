@@ -15,7 +15,18 @@ namespace SteamEngineer
             var p = FindFirstObjectByType<PlayerController>(); if (p) player = p.transform;
             var gm = GameManager.Instance; if (gm != null) hp.ScaleMax(gm.EnemyHpMul);
         }
-        protected virtual void OnDied() { AudioManager.Kill(); GameManager.Instance.Run.AddStageMaterial(dropAmount); Destroy(gameObject); }
+        protected virtual void OnDied()
+        {
+            AudioManager.Kill();
+            var run = GameManager.Instance.Run;
+            run.AddStageMaterial(dropAmount);
+            float boom = run.RelicValue(RelicEffect.KillExplosion);                    // 蒸気爆発
+            if (boom > 0f)
+                foreach (var c in Physics2D.OverlapCircleAll(transform.position, 2.5f))
+                    if (c.gameObject != gameObject && c.GetComponent<EnemyBase>() != null && c.TryGetComponent(out Health h))
+                        h.Damage(Mathf.Max(1, Mathf.RoundToInt(boom)));
+            Destroy(gameObject);
+        }
 
         // 吹き飛ばし(風・胴体の特性などで使う)。ボスは上書きして無効にする
         public virtual void Push(Vector2 dir, float force, float stun)
