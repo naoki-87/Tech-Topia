@@ -13,6 +13,7 @@ namespace SteamEngineer
         {
             if (done || e != required) return false;
             done = true;
+            Fx.Puffs(transform.position, Fx.ElementColor(required), 12, 3f, Vector2.up, 0.3f, 0.6f);
             GameManager.Instance.Run.AddStageMaterial(rewardMaterials);
             if (sr) sr.color = activatedColor;
             onActivated?.Invoke();

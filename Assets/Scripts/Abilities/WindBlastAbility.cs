@@ -9,12 +9,16 @@ namespace SteamEngineer
         public override void Activate(PlayerController p)
         {
             Vector2 center = (Vector2)p.attackPoint.position + Vector2.right * p.Facing * reach;
+            var col = Fx.ElementColor(element);
+            Fx.Ring(center, radius, col);                                                      // Œø‰Ê”ÍˆÍ(”»’è‚Æ“¯‚¶”¼Œa)
+            Fx.WindStreaks(center, p.Facing, radius * 2f, radius * 1.4f, new Color(col.r, col.g, col.b, 0.9f));
+            Fx.Puffs(center - Vector2.right * p.Facing * radius * 0.6f, col, 6, 5f, Vector2.right * p.Facing, 0.22f, 0.4f);
             p.EmitElement(element, center, radius);
             foreach (var c in Physics2D.OverlapCircleAll(center, radius))
             {
                 if (!c.TryGetComponent(out EnemyBase e)) continue;
                 e.Push(new Vector2(p.Facing, 0.2f).normalized, force, stun);
-                if (c.TryGetComponent(out Health h)) h.Damage(Mathf.Max(1, Mathf.RoundToInt(p.CurrentAttack * damageMul)));
+                if (c.TryGetComponent(out Health h)) { h.Damage(Mathf.Max(1, Mathf.RoundToInt(p.CurrentAttack * damageMul))); Fx.Hit(c.bounds.center); }
             }
         }
     }

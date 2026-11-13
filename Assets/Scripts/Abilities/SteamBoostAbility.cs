@@ -9,7 +9,9 @@ namespace SteamEngineer
         public override void Activate(PlayerController p)
         {
             var v = p.Body.linearVelocity; v.y = boostSpeed; p.Body.linearVelocity = v;
-            Vector2 foot = p.groundCheck.position;
+            Vector2 foot = p.groundCheck.position; var col = Fx.ElementColor(element);
+            Fx.Ring(foot, radius, col);                                          // Œø‰Ê”ÍˆÍ(”»’è‚Æ“¯‚¶”¼Œa)
+            Fx.Puffs(foot, col, 14, 3.5f, Vector2.down, 0.3f, 0.6f);            // ‘«Œ³‚Ìö‹C
             p.EmitElement(element, foot, radius);
             p.DamageAround(foot, radius, Mathf.Max(1, Mathf.RoundToInt(p.CurrentAttack * damageMul)));
         }

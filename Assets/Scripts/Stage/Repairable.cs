@@ -9,6 +9,7 @@ namespace SteamEngineer
         public void Repair(PlayerController p)
         {
             if (done) return; done = true;
+            Fx.Hit(transform.position); Fx.Puffs(transform.position, new Color(0.9f, 0.95f, 1f), 8, 2.5f, Vector2.up);
             AudioManager.Repair();
             GameManager.Instance.Run.AddStageMaterial(rewardMaterials); p.Health.Heal(heal); p.SyncHp();
             if (sr && fixedSprite) sr.sprite = fixedSprite; onRepaired?.Invoke();

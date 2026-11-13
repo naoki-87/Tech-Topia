@@ -118,10 +118,11 @@ namespace SteamEngineer
             float m = Stats.attackBoxMul;                                                         // 武器の特性で範囲が広がる
             Vector2 box = new Vector2(attackBox.x * m, attackBox.y * Mathf.Lerp(1f, m, 0.5f));
             Vector2 center = (Vector2)attackPoint.position + Vector2.right * facing * (box.x - attackBox.x) * 0.5f;
+            Fx.Slash(center, box, facing);     // 攻撃範囲の表示と斬撃
             foreach (var c in Physics2D.OverlapBoxAll(center, box, 0, hitMask))
             {
                 if (c.TryGetComponent(out Repairable r)) r.Repair(this);
-                else if (c.TryGetComponent(out Health h) && h != Health) h.Damage(CurrentAttack);
+                else if (c.TryGetComponent(out Health h) && h != Health) { h.Damage(CurrentAttack); Fx.Hit(c.bounds.center); }
             }
         }
 
@@ -178,7 +179,7 @@ namespace SteamEngineer
         public void DamageAround(Vector2 center, float radius, int dmg)
         {
             foreach (var c in Physics2D.OverlapCircleAll(center, radius))
-                if (c.GetComponent<EnemyBase>() != null && c.TryGetComponent(out Health h)) h.Damage(dmg);
+                if (c.GetComponent<EnemyBase>() != null && c.TryGetComponent(out Health h)) { h.Damage(dmg); Fx.Hit(c.bounds.center); }
         }
         void OnDrawGizmosSelected()
         {
