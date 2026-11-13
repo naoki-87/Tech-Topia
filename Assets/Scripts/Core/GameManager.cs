@@ -11,6 +11,7 @@ namespace SteamEngineer
         public RelicData[] relicPool;        // 遺物の候補(Tools > TechTopia > 遺物アセットを作成 で自動設定)
         [Header("1周の長さ")]
         public int visitsPerArea = 2;        // 各エリアを何回使うか(2エリア × 2 = 4エリア)
+        public bool keepTierOnCarryOver = false;   // 次の周回で、解放済みの装備を、解放したティアのまま使うか
         [Header("敵の強さ")]
         public bool scaleEnemies = true;
         public float enemyHpPerPower = 0.05f, enemyHpCap = 2.5f, enemyHpPerArea = 0.12f;
@@ -41,13 +42,21 @@ namespace SteamEngineer
             Instance = this; DontDestroyOnLoad(gameObject); Save = SaveData.Load();
         }
 
+        public EquipmentData FindEquipment(string id)
+        {
+            foreach (var a in allAreas)
+                if (a != null && a.craftable != null)
+                    foreach (var e in a.craftable) if (e != null && e.name == id) return e;
+            return null;
+        }
+
         public void StartRun()
         {
             if (ExhibitionManager.Instance != null)
                 Save.commonMaterials = Mathf.Max(Save.commonMaterials, ExhibitionManager.Instance.minCommonMaterials);
             var lv = new int[RunState.Slots];
             for (int i = 0; i < lv.Length; i++) lv[i] = Save.StartLevel(i);
-            Run = new RunState(allAreas, starters, Save, lv, visitsPerArea);
+            Run = new RunState(allAreas, starters, Save, lv, visitsPerArea, FindEquipment, keepTierOnCarryOver);
             Run.RollChoices(); Load("AreaSelect");
         }
         public void ChooseArea(AreaData a) { Run.BeginArea(a); Load("Stage"); }

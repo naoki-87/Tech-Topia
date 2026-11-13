@@ -31,7 +31,8 @@ namespace SteamEngineer
         // 進行度でドロップのティアが上がる(4エリアで 0→3)。解放済みの範囲に抑える
         public Tier DropTier => (Tier)Mathf.Min(Mathf.Min(4, areasCleared * 4 / Mathf.Max(1, totalAreas)), (int)MaxCraftTier);
 
-        public RunState(AreaData[] all, EquipmentData[] starters, SaveData save, int[] startLevels = null, int visitsPerArea = 1)
+        public RunState(AreaData[] all, EquipmentData[] starters, SaveData save, int[] startLevels = null, int visitsPerArea = 1,
+                    System.Func<string, EquipmentData> find = null, bool keepTier = false)
         {
             this.save = save; remaining = new List<AreaData>();
             foreach (var a in all)
@@ -44,6 +45,20 @@ namespace SteamEngineer
                 int want = startLevels != null ? startLevels[i] : save.baseLevel[i];
                 level[i] = Mathf.Clamp(want, 0, save.baseLevel[i]);
             }
+            // 解放済みの装備: 装着の指定があれば装着し、ほかは持ち物へ(ガレージで切り替えられる)
+            if (find != null)
+                foreach (var o in save.owned)
+                {
+                    var e = find(o.id); if (e == null) continue;
+                    int s = (int)e.slot;
+                    var t = keepTier ? (Tier)Mathf.Min(o.tier, (int)MaxCraftTier) : Tier.Crude;
+                    if (save.loadout[s] == o.id)
+                    {
+                        if (equipped[s] != null) stash[equipped[s]] = new EquipState { tier = tier[s], level = level[s] };   // 初期装備は持ち物へ
+                        equipped[s] = e; tier[s] = t; swapped = true;
+                    }
+                    else stash[e] = new EquipState { tier = t, level = level[s] };
+                }
             hp = PlayerStats.Build(this).maxHp;
         }
 
@@ -139,6 +154,7 @@ namespace SteamEngineer
             mats[(e.sourceArea, t)] -= e.coreCost; save.commonMaterials -= CommonCraft(e, t);
             int i = (int)e.slot; Stow(i);
             equipped[i] = e; tier[i] = t; level[i] = 0; swapped = true;
+            save.Unlock(e, t);
             ClampHp(); CheckRankUp(); return true;
         }
         void Stow(int i)
@@ -174,7 +190,7 @@ namespace SteamEngineer
             if (!CanUpgradeTier(slot)) return false;
             var e = equipped[slot]; var next = tier[slot] + 1;
             mats[(e.sourceArea, next)] -= UpgradeCore(e); save.commonMaterials -= CommonUpgrade(e, next);
-            tier[slot] = next; ClampHp(); CheckRankUp(); return true;
+            tier[slot] = next; if (!e.isStarter) save.Unlock(e, next); ClampHp(); CheckRankUp(); return true;
         }
 
         // ---------- 工房ランク ----------
