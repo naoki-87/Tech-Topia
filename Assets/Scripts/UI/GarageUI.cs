@@ -38,7 +38,7 @@ namespace SteamEngineer
             var b = Instantiate(listButtonPrefab, listRoot);
             b.GetComponentInChildren<TMP_Text>().text = label;
             b.interactable = interactable;
-            if (onClick != null) b.onClick.AddListener(() => { onClick(); Refresh(); });
+            if (onClick != null) b.onClick.AddListener(() => { notice = ""; onClick(); Refresh(); });
             return b;
         }
         void Notice(int rankBefore)
@@ -100,6 +100,18 @@ namespace SteamEngineer
                 }
 
             // 装備のティア強化
+            // 素材の分解(ステージで集めた素材 → 汎用素材)
+            foreach (var da in gm.allAreas)
+                for (int dt = 0; dt < 5; dt++)
+                {
+                    var dArea = da; var dTier = (Tier)dt; int dn = run.Mat(dArea, dTier); if (dn <= 0) continue;
+                    int dy = RunState.DisassembleYield(dTier, gm.disassembleBase);
+                    Add($"分解 {dArea.materialName}[{dTier.Label()}]x1 → 汎用素材 +{dy}", true,
+                        () => { run.Disassemble(dArea, dTier, 1, gm.disassembleBase); notice = $"分解した: 汎用素材 +{dy}"; }); count++;
+                    if (dn >= 2)
+                        Add($"分解 {dArea.materialName}[{dTier.Label()}]x{dn}(すべて) → 汎用素材 +{dy * dn}", true,
+                            () => { int g = run.Disassemble(dArea, dTier, 999, gm.disassembleBase); notice = $"分解した: 汎用素材 +{g}"; }); count++;
+                }
             for (int s = 0; s < RunState.Slots; s++)
             {
                 var e = run.equipped[s];

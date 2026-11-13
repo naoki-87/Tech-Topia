@@ -113,6 +113,15 @@ namespace SteamEngineer
             mats[(a, t)] -= 3; mats[(a, t + 1)] = Mat(a, t + 1) + 1; return true;
         }
 
+        // 素材の分解: ステージで集めた素材 → 汎用素材(1個あたり 基準値×(ティア+1))
+        public static int DisassembleYield(Tier t, int baseYield) => Mathf.Max(1, baseYield) * ((int)t + 1);
+        public int Disassemble(AreaData a, Tier t, int count, int baseYield)
+        {
+            int have = Mat(a, t); count = Mathf.Min(count, have); if (count <= 0) return 0;
+            mats[(a, t)] = have - count;
+            int gain = DisassembleYield(t, baseYield) * count; save.commonMaterials += gain; return gain;
+        }
+
         // ---------- 装備の作成・切り替え ----------
         public static int CommonCraft(EquipmentData e, Tier t) => e.commonCost * ((int)t + 1);
         public bool Owns(EquipmentData e)

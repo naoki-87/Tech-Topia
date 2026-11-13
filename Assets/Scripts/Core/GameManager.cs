@@ -15,6 +15,8 @@ namespace SteamEngineer
         public bool scaleEnemies = true;
         public float enemyHpPerPower = 0.05f, enemyHpCap = 2.5f, enemyHpPerArea = 0.12f;
         public int enemyDmgStep = 8, enemyDmgMax = 2;
+        [Header("素材の分解")]
+        public int disassembleBase = 2;      // 分解で得る汎用素材の基準値(×(ティア+1))
         public SaveData Save; public RunState Run;
 
         public float EnemyHpMul
