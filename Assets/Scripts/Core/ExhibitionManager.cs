@@ -45,7 +45,7 @@ namespace SteamEngineer
             {
                 if (gm != null)
                 {
-                    if (scene == "Title" && kb.enterKey.wasPressedThisFrame && !HelpPanel.Blocking) gm.StartRun();
+                    if (scene == "Title" && kb.enterKey.wasPressedThisFrame && !HelpPanel.Blocking && !LoadoutUI.Blocking) gm.StartRun();
                     else if (scene == "Result" && kb.enterKey.wasPressedThisFrame) gm.BackToTitle();
                 }
                 if (kb.escapeKey.isPressed) { quitHold += Time.unscaledDeltaTime; if (quitHold >= quitHoldSeconds) Application.Quit(); }

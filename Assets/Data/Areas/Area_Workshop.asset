@@ -24,5 +24,6 @@ MonoBehaviour:
   bossStagePrefab: {fileID: 1139021799159812692, guid: 36d3ad3d5b816c74ab4fab871cc172a6, type: 3}
   craftable: []
   requiredRank: 0
+  description: "\u6A5F\u68B0\u3068\u90E8\u54C1\u306E\u6575\u3002\u84B8\u6C17\u3084\u6B6F\u8ECA\u306E\u30AE\u30DF\u30C3\u30AF\u304C\u591A\u3044"
   backgroundColor: {r: 0.1, g: 0.06666667, b: 0.043137256, a: 1}
   background: {fileID: 686803717991814184, guid: 69da2b75edd981a46a67b0d3851b748e, type: 3}
