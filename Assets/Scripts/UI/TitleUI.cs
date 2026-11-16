@@ -8,7 +8,7 @@ namespace SteamEngineer
         public Transform rowRoot; public BaseRow rowPrefab;            // 旧UI(使わない。割り当てはそのままでよい)
         static readonly string[] rankNames = { "素人", "職人", "達人", "工房", "伝説" };
         static readonly Color Dark = new Color32(0x2B, 0x1D, 0x12, 255), Brass = new Color32(0xB8, 0x86, 0x0B, 255), Cream = new Color32(0xF0, 0xDC, 0xB8, 255);
-        RectTransform menu; TMP_Text toast; float toastUntil; EquipmentUI equip; HelpPanel help;
+        RectTransform menu; TMP_Text toast; float toastUntil; EquipmentUI equip; HelpPanel help; AchievementUI ach;
 
         void Start()
         {
@@ -16,13 +16,14 @@ namespace SteamEngineer
             if (rowRoot) rowRoot.gameObject.SetActive(false);
             var canvas = info.canvas.rootCanvas;
             equip = gameObject.AddComponent<EquipmentUI>(); equip.Init(canvas);
+            ach = gameObject.AddComponent<AchievementUI>(); ach.Init(canvas);
             help = FindFirstObjectByType<HelpPanel>();
 
             var go = new GameObject("TitleMenu", typeof(RectTransform)); go.transform.SetParent(canvas.transform, false);
             menu = (RectTransform)go.transform; menu.anchorMin = Vector2.zero; menu.anchorMax = Vector2.one; menu.offsetMin = menu.offsetMax = Vector2.zero;
             Big("スタート", -430f, () => GameManager.Instance.StartRun());
             Big("装備一覧", -570f, () => equip.Open());
-            Big("実績", -710f, () => Toast("実績は準備中です(次の更新で追加)"));
+            Big("実績", -710f, () => ach.Open());
             Small("操作説明", -145f, -870f, () => { if (help) help.Open(); else Toast("操作説明が見つかりません"); });
             Small("設定", 145f, -870f, () => Toast("設定は準備中です(次の更新で追加)"));
 
@@ -50,7 +51,7 @@ namespace SteamEngineer
         {
             var sv = GameManager.Instance.Save;
             info.text = $"コア {sv.cores}   工房ランク {rankNames[Mathf.Clamp(sv.rank, 0, 4)]}   汎用素材 {sv.commonMaterials}";
-            menu.gameObject.SetActive(!HelpPanel.IsOpen && !EquipmentUI.IsOpen);
+            menu.gameObject.SetActive(!HelpPanel.IsOpen && !EquipmentUI.IsOpen && !AchievementUI.IsOpen);
             if (toast.text != "" && Time.unscaledTime > toastUntil) toast.text = "";
         }
     }

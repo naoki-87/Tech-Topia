@@ -27,7 +27,7 @@ namespace SteamEngineer
 
         public int Rank => save.rank;
         public bool IsBossStage => stageIndex == StagesPerArea - 1;
-        public Tier MaxCraftTier => (Tier)Mathf.Min(4, save.rank + 1);
+        public Tier MaxCraftTier => save.MaxTier;
         // 進行度でドロップのティアが上がる(4エリアで 0→3)。解放済みの範囲に抑える
         public Tier DropTier => (Tier)Mathf.Min(Mathf.Min(4, areasCleared * 4 / Mathf.Max(1, totalAreas)), (int)MaxCraftTier);
 
@@ -194,18 +194,7 @@ namespace SteamEngineer
         }
 
         // ---------- 工房ランク ----------
-        void CheckRankUp()
-        {
-            bool up = false;
-            while (save.rank < 4)
-            {
-                bool all = true;
-                for (int i = 0; i < Slots; i++) if ((int)tier[i] < save.rank + 1) { all = false; break; }
-                if (!all) break;
-                save.rank++; up = true;
-            }
-            if (up) save.Write();
-        }
+        void CheckRankUp() { }
         void ClampHp() { hp = Mathf.Min(hp, PlayerStats.Build(this).maxHp); }
 
         public void Upgrade(EquipSlot s)
@@ -227,6 +216,7 @@ namespace SteamEngineer
         {
             if (r == null || !relicOffers.Contains(r)) return false;
             relics.Add(r); relicOffers.Clear();
+            save.Discover("relic:" + r.name);
             if (r.effect == RelicEffect.MaxHp) hp += Mathf.RoundToInt(r.value);       // 最大HPが増えた分、HPも増やす
             return true;
         }

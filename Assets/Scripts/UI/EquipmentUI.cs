@@ -20,7 +20,7 @@ namespace SteamEngineer
         readonly Button[] tabBtn = new Button[5];
         int tab; string notice = ""; EquipmentData detailEquip;
         GameManager G => GameManager.Instance; SaveData S => GameManager.Instance.Save;
-        Tier MaxTier => (Tier)Mathf.Min(4, S.rank + 1);
+        Tier MaxTier => S.MaxTier;
 
         // ---------- UI部品 ----------
         static TMP_Text MakeText(string name, Transform parent, string text, int size, Color col, TextAlignmentOptions al)
@@ -137,14 +137,16 @@ namespace SteamEngineer
                 tabBtn[i].GetComponent<Image>().color = i == tab ? BrassHi : BrassLo;
                 tabBtn[i].GetComponentInChildren<TMP_Text>().color = i == tab ? Dark : Cream;
             }
+            tabBtn[2].GetComponentInChildren<TMP_Text>().text = S.Has(Unlocks.TierRank) ? tabNames[2] : tabNames[2] + "(未解放)";
+            tabBtn[3].GetComponentInChildren<TMP_Text>().text = S.Has(Unlocks.BaseEnhance) ? tabNames[3] : tabNames[3] + "(未解放)";
             scrollRT.offsetMin = new Vector2(60f, 170f); scrollRT.offsetMax = new Vector2(tab == 0 ? -760f : -60f, -265f);
             detailText.gameObject.SetActive(tab == 0);
             switch (tab)
             {
                 case 0: BuildEquip(); detailText.text = DetailOf(detailEquip); break;
                 case 1: BuildCraft(); break;
-                case 2: BuildTier(); break;
-                case 3: BuildBase(); break;
+                case 2: if (S.Has(Unlocks.TierRank)) BuildTier(); else BuildLocked("main_workshop"); break;
+                case 3: if (S.Has(Unlocks.BaseEnhance)) BuildBase(); else BuildLocked("main_first"); break;
                 default: BuildMat(); break;
             }
             LayoutRebuilder.ForceRebuildLayoutImmediate(content); Canvas.ForceUpdateCanvases();
@@ -206,7 +208,7 @@ namespace SteamEngineer
         int CraftCommon(EquipmentData e, Tier t) => e.commonCost * ((int)t + 1);
         string CraftWhy(AreaData a, EquipmentData e, Tier t)
         {
-            if (t > MaxTier) return "工房ランク不足";
+            if (t > MaxTier) return S.Has(Unlocks.TierRank) ? "工房ランク不足" : "上位のティアは未解放(実績)";
             int have = S.Stock(a.name, t); if (have < e.coreCost) return $"素材不足 {have}/{e.coreCost}";
             int need = CraftCommon(e, t); if (S.commonMaterials < need) return $"汎用素材不足 {S.commonMaterials}/{need}";
             return "";
@@ -271,6 +273,14 @@ namespace SteamEngineer
             if (TierWhy(e, next) != "") return;
             S.AddStock(e.sourceArea.name, next, -TierCore(e)); S.commonMaterials -= TierCommon(e, next); S.SetTier(e.name, next);
             notice = $"{e.displayName} が [{next.Label()}] になった"; S.Write();
+        }
+
+        void BuildLocked(string achId)
+        {
+            AddHeader("【未解放】この機能は、実績を達成すると使えるようになります", 70f);
+            var d = Achievements.Find(achId); if (d == null) return;
+            var t = MakeText("Lock", content, Achievements.Describe(d, S), 32, Cream, TextAlignmentOptions.TopLeft);
+            t.gameObject.AddComponent<LayoutElement>().preferredHeight = 260f;
         }
 
         // ---------- タブ3: 基礎強化 ----------

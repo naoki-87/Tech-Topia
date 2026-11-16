@@ -14,9 +14,13 @@ namespace SteamEngineer
         public List<OwnedEquip> owned = new List<OwnedEquip>();     // 作成して解放した装備(初期装備は含まない)
         [Serializable] public class StockEntry { public string area; public int tier; public int count; }
         [Serializable] public class TierEntry { public string id; public int tier; }
+        [Serializable] public class StatEntry { public string key; public int value; }
         public string[] loadout = { "", "", "", "" };               // 部位ごとの装着指定(""=初期装備)
         public List<StockEntry> stock = new List<StockEntry>();    // 清算済みの素材(エリア×ティア)
         public List<TierEntry> tiers = new List<TierEntry>();      // 装備ごとのティア(初期装備を含む)
+        public List<StatEntry> stats = new List<StatEntry>();        // 実績の記録(周回クリア数など)
+        public List<string> achieved = new List<string>();           // 達成済みの実績
+        public List<string> discovered = new List<string>();         // 見つけた遺物などのコレクション
         public List<string> unlocks = new List<string>();          // 解放済みの機能・装備・エリア(段階3で使う)
         [NonSerialized] public string lastSummary = "";            // 直近の清算内容(リザルト表示用)
 
@@ -39,6 +43,9 @@ namespace SteamEngineer
             if (owned == null) owned = new List<OwnedEquip>();
             if (stock == null) stock = new List<StockEntry>();
             if (tiers == null) tiers = new List<TierEntry>();
+            if (stats == null) stats = new List<StatEntry>();
+            if (achieved == null) achieved = new List<string>();
+            if (discovered == null) discovered = new List<string>();
             if (unlocks == null) unlocks = new List<string>();
         }
         public void Write() { try { File.WriteAllText(FilePath, JsonUtility.ToJson(this)); } catch (Exception e) { Debug.LogWarning(e); } }
@@ -57,6 +64,9 @@ namespace SteamEngineer
                 sb.AppendLine($"{kv.Key.Item1.materialName}[{kv.Key.Item2.Label()}] x{kv.Value}");
             }
             lastSummary = (sb.Length > 0 ? "【素材を清算】\n" + sb : "【素材を清算】なし") + $"\n汎用素材 +{common}" + (win ? $"  コア +{run.coresCollected}" : "");
+            AddStat("runs", 1); if (win) AddStat("runs_cleared", 1); AddStat("areas_cleared", run.areasCleared);
+            var news = Achievements.CheckAll(this);
+            if (news.Count > 0) lastSummary += "\n\n★ 実績を達成！\n" + string.Join("\n", news);
         }
         public int Stock(string area, Tier t) { foreach (var s in stock) if (s.area == area && s.tier == (int)t) return s.count; return 0; }
         public void AddStock(string area, Tier t, int n)
@@ -67,6 +77,15 @@ namespace SteamEngineer
         }
         public bool Has(string flag) => unlocks.Contains(flag);
         public void UnlockFlag(string flag) { if (!unlocks.Contains(flag)) { unlocks.Add(flag); Write(); } }
+        public Tier MaxTier => Has(Unlocks.TierRank) ? (Tier)Mathf.Min(4, rank + 1) : Tier.Crude;   // 作成・ティアの上限
+        public int Stat(string key) { foreach (var x in stats) if (x.key == key) return x.value; return 0; }
+        public void AddStat(string key, int n)
+        {
+            foreach (var x in stats) if (x.key == key) { x.value += n; return; }
+            stats.Add(new StatEntry { key = key, value = n });
+        }
+        public bool IsAchieved(string id) => achieved.Contains(id);
+        public void Discover(string key) { if (!discovered.Contains(key)) discovered.Add(key); }
 
         // 装備の解放(作成・ティア強化のときに呼ぶ)。初期装備は対象外
         public void Unlock(EquipmentData e, Tier t)
