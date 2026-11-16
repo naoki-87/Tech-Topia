@@ -18,6 +18,8 @@ namespace SteamEngineer
         public int enemyDmgStep = 8, enemyDmgMax = 2;
         [Header("素材の分解")]
         public int disassembleBase = 2;      // 分解で得る汎用素材の基準値(×(ティア+1))
+        [Header("装備一覧(ティア上昇のハードル)")]
+        public int tierUpCoreMul = 2, tierUpCommonMul = 2;
         public SaveData Save; public RunState Run;
 
         public float EnemyHpMul

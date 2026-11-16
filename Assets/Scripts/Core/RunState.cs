@@ -41,7 +41,7 @@ namespace SteamEngineer
             totalAreas = remaining.Count;
             for (int i = 0; i < Slots; i++)
             {
-                equipped[i] = starters[i]; tier[i] = Tier.Crude;
+                equipped[i] = starters[i]; tier[i] = save.GetTier(starters[i].name);
                 int want = startLevels != null ? startLevels[i] : save.baseLevel[i];
                 level[i] = Mathf.Clamp(want, 0, save.baseLevel[i]);
             }
@@ -51,7 +51,7 @@ namespace SteamEngineer
                 {
                     var e = find(o.id); if (e == null) continue;
                     int s = (int)e.slot;
-                    var t = keepTier ? (Tier)Mathf.Min(o.tier, (int)MaxCraftTier) : Tier.Crude;
+                    var t = save.GetTier(e.name);
                     if (save.loadout[s] == o.id)
                     {
                         if (equipped[s] != null) stash[equipped[s]] = new EquipState { tier = tier[s], level = level[s] };   // 初期装備は持ち物へ

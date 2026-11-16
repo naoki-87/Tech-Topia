@@ -18,6 +18,7 @@ namespace SteamEngineer
 
         void Start()
         {
+            if (SceneManager.GetActiveScene().name == "Title") { enabled = false; return; }
             var c = GetComponentInParent<Canvas>(); if (c == null) c = FindFirstObjectByType<Canvas>();
             if (c == null) { Debug.LogError("LoadoutUI: Canvas ‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ"); return; }
             canvas = c.rootCanvas; titleMode = SceneManager.GetActiveScene().name == "Title";

@@ -1,48 +1,57 @@
 using TMPro; using UnityEngine; using UnityEngine.UI;
 namespace SteamEngineer
 {
-    // タイトル: スタート / 基礎強化(コア消費・永続) / 開始レベルの調整(縛りプレイ)
+    // タイトル: スタート / 装備一覧 / 実績 を縦に、その下に 操作説明 / 設定 を横に並べる
     public class TitleUI : MonoBehaviour
     {
         public Button startButton; public TMP_Text info;
-        public Transform rowRoot; public BaseRow rowPrefab;
-        readonly BaseRow[] rows = new BaseRow[RunState.Slots];
-        static readonly string[] names = { "帽子", "作業着", "安全靴", "レンチ" };
+        public Transform rowRoot; public BaseRow rowPrefab;            // 旧UI(使わない。割り当てはそのままでよい)
         static readonly string[] rankNames = { "素人", "職人", "達人", "工房", "伝説" };
+        static readonly Color Dark = new Color32(0x2B, 0x1D, 0x12, 255), Brass = new Color32(0xB8, 0x86, 0x0B, 255), Cream = new Color32(0xF0, 0xDC, 0xB8, 255);
+        RectTransform menu; TMP_Text toast; float toastUntil; EquipmentUI equip; HelpPanel help;
 
         void Start()
         {
-            var gm = GameManager.Instance;
-            startButton.onClick.AddListener(gm.StartRun);
-            for (int i = 0; i < rows.Length; i++)
-            {
-                int s = i; var r = Instantiate(rowPrefab, rowRoot); rows[i] = r;
-                r.spend.onClick.AddListener(() => { if (gm.Save.SpendCore((EquipSlot)s)) gm.Save.Write(); Refresh(); });
-                r.minus.onClick.AddListener(() => Change(s, -1));
-                r.plus.onClick.AddListener(() => Change(s, +1));
-            }
-            Refresh();
+            if (startButton) startButton.gameObject.SetActive(false);
+            if (rowRoot) rowRoot.gameObject.SetActive(false);
+            var canvas = info.canvas.rootCanvas;
+            equip = gameObject.AddComponent<EquipmentUI>(); equip.Init(canvas);
+            help = FindFirstObjectByType<HelpPanel>();
+
+            var go = new GameObject("TitleMenu", typeof(RectTransform)); go.transform.SetParent(canvas.transform, false);
+            menu = (RectTransform)go.transform; menu.anchorMin = Vector2.zero; menu.anchorMax = Vector2.one; menu.offsetMin = menu.offsetMax = Vector2.zero;
+            Big("スタート", -430f, () => GameManager.Instance.StartRun());
+            Big("装備一覧", -570f, () => equip.Open());
+            Big("実績", -710f, () => Toast("実績は準備中です(次の更新で追加)"));
+            Small("操作説明", -145f, -870f, () => { if (help) help.Open(); else Toast("操作説明が見つかりません"); });
+            Small("設定", 145f, -870f, () => Toast("設定は準備中です(次の更新で追加)"));
+
+            var t = new GameObject("Toast", typeof(RectTransform), typeof(TextMeshProUGUI)); t.transform.SetParent(canvas.transform, false);
+            toast = t.GetComponent<TextMeshProUGUI>(); toast.fontSize = 32; toast.color = Cream; toast.alignment = TextAlignmentOptions.Center; toast.raycastTarget = false;
+            var r = toast.rectTransform; r.anchorMin = r.anchorMax = new Vector2(0.5f, 0f); r.pivot = new Vector2(0.5f, 0f); r.anchoredPosition = new Vector2(0f, 60f); r.sizeDelta = new Vector2(1500f, 50f);
+            toast.text = "";
         }
 
-        void Change(int slot, int delta)
+        void Add(string label, float x, float y, float w, float h, int size, UnityEngine.Events.UnityAction act)
         {
-            var sv = GameManager.Instance.Save;
-            sv.startLevel[slot] = Mathf.Clamp(sv.StartLevel(slot) + delta, 0, sv.baseLevel[slot]);
-            sv.Write(); Refresh();
+            var go = new GameObject(label, typeof(RectTransform), typeof(Image), typeof(Button)); go.transform.SetParent(menu, false);
+            go.GetComponent<Image>().color = Brass;
+            var r = (RectTransform)go.transform; r.anchorMin = r.anchorMax = new Vector2(0.5f, 1f); r.pivot = new Vector2(0.5f, 1f); r.anchoredPosition = new Vector2(x, y); r.sizeDelta = new Vector2(w, h);
+            var tg = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI)); tg.transform.SetParent(go.transform, false);
+            var t = tg.GetComponent<TextMeshProUGUI>(); t.text = label; t.fontSize = size; t.color = Dark; t.alignment = TextAlignmentOptions.Center; t.raycastTarget = false;
+            var lr = t.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one; lr.offsetMin = new Vector2(8f, 4f); lr.offsetMax = new Vector2(-8f, -4f);
+            go.GetComponent<Button>().onClick.AddListener(act);
         }
+        void Big(string label, float y, UnityEngine.Events.UnityAction act) => Add(label, 0f, y, 560f, 120f, 48, act);
+        void Small(string label, float x, float y, UnityEngine.Events.UnityAction act) => Add(label, x, y, 270f, 100f, 32, act);
+        void Toast(string s) { toast.text = s; toastUntil = Time.unscaledTime + 2.5f; }
 
-        void Refresh()
+        void Update()
         {
             var sv = GameManager.Instance.Save;
             info.text = $"コア {sv.cores}   工房ランク {rankNames[Mathf.Clamp(sv.rank, 0, 4)]}   汎用素材 {sv.commonMaterials}";
-            for (int i = 0; i < rows.Length; i++)
-            {
-                int b = sv.baseLevel[i], st = sv.StartLevel(i);
-                rows[i].label.text = $"{names[i]}   基礎Lv {b}   開始Lv {st}" + (st < b ? "  (縛り)" : "");
-                rows[i].spend.interactable = sv.cores > 0;
-                rows[i].minus.interactable = st > 0;
-                rows[i].plus.interactable = st < b;
-            }
+            menu.gameObject.SetActive(!HelpPanel.IsOpen && !EquipmentUI.IsOpen);
+            if (toast.text != "" && Time.unscaledTime > toastUntil) toast.text = "";
         }
     }
 }

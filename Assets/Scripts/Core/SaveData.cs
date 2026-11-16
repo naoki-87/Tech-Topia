@@ -13,8 +13,10 @@ namespace SteamEngineer
         public int[] startLevel = { -1, -1, -1, -1 };               // 開始レベル(-1 = 基礎レベルと同じ)
         public List<OwnedEquip> owned = new List<OwnedEquip>();     // 作成して解放した装備(初期装備は含まない)
         [Serializable] public class StockEntry { public string area; public int tier; public int count; }
+        [Serializable] public class TierEntry { public string id; public int tier; }
         public string[] loadout = { "", "", "", "" };               // 部位ごとの装着指定(""=初期装備)
         public List<StockEntry> stock = new List<StockEntry>();    // 清算済みの素材(エリア×ティア)
+        public List<TierEntry> tiers = new List<TierEntry>();      // 装備ごとのティア(初期装備を含む)
         public List<string> unlocks = new List<string>();          // 解放済みの機能・装備・エリア(段階3で使う)
         [NonSerialized] public string lastSummary = "";            // 直近の清算内容(リザルト表示用)
 
@@ -36,6 +38,7 @@ namespace SteamEngineer
             for (int i = 0; i < 4; i++) if (loadout[i] == null) loadout[i] = "";
             if (owned == null) owned = new List<OwnedEquip>();
             if (stock == null) stock = new List<StockEntry>();
+            if (tiers == null) tiers = new List<TierEntry>();
             if (unlocks == null) unlocks = new List<string>();
         }
         public void Write() { try { File.WriteAllText(FilePath, JsonUtility.ToJson(this)); } catch (Exception e) { Debug.LogWarning(e); } }
@@ -69,9 +72,16 @@ namespace SteamEngineer
         public void Unlock(EquipmentData e, Tier t)
         {
             if (e == null || e.isStarter) return;
-            foreach (var o in owned)
-                if (o.id == e.name) { if ((int)t > o.tier) { o.tier = (int)t; Write(); } return; }
-            owned.Add(new OwnedEquip { id = e.name, tier = (int)t }); Write();
+            bool has = false; foreach (var o in owned) if (o.id == e.name) { has = true; break; }
+            if (!has) owned.Add(new OwnedEquip { id = e.name, tier = (int)t });
+            if (!has || (int)t > (int)GetTier(e.name)) SetTier(e.name, t);
+            Write();
+        }
+        public Tier GetTier(string id) { foreach (var x in tiers) if (x.id == id) return (Tier)Mathf.Clamp(x.tier, 0, 4); return Tier.Crude; }
+        public void SetTier(string id, Tier t)
+        {
+            foreach (var x in tiers) if (x.id == id) { x.tier = (int)t; return; }
+            tiers.Add(new TierEntry { id = id, tier = (int)t });
         }
     }
 }

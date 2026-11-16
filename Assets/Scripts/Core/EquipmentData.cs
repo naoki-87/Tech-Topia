@@ -7,6 +7,7 @@ namespace SteamEngineer
         public string displayName; public Sprite icon;
         public EquipSlot slot; public AreaData sourceArea;
         public bool isStarter;
+        [TextArea] public string description;     // 装備一覧に出す説明文
         [Header("Craft cost")] public int coreCost = 3; public int commonCost = 5;
         [Header("Stats (Tier倍率: 1+0.25*tier)")]
         public int hpBase, hpPerLevel;

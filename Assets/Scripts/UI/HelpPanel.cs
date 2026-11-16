@@ -12,6 +12,7 @@ namespace SteamEngineer
 
         public GameObject panel;
         public Button openButton, closeButton, prevButton, nextButton;
+        public GameObject[] hideWhileOpen;      // 説明を開いている間、隠すUI(スタートボタン、BaseRows など)
         public GameObject[] pages;                                     // 0:操作 1:ギミック 2:敵
         public string[] pageTitles = { "操作方法", "ギミック", "登場する敵" };
         public TMP_Text titleText, pageLabel;
@@ -22,9 +23,9 @@ namespace SteamEngineer
         void Start()
         {
             Build(gimmickRoot, gimmicks); Build(enemyRoot, enemies);
-            openButton.onClick.AddListener(Open); closeButton.onClick.AddListener(Close);
+            if (openButton) openButton.onClick.AddListener(Open); closeButton.onClick.AddListener(Close);
             prevButton.onClick.AddListener(() => Go(-1)); nextButton.onClick.AddListener(() => Go(1));
-            panel.SetActive(false); IsOpen = false;
+            panel.SetActive(false); IsOpen = false; SetBackUi(true);
         }
         void OnDestroy() { IsOpen = false; }
         void Build(Transform root, Entry[] list)
@@ -32,8 +33,13 @@ namespace SteamEngineer
             if (root == null || list == null) return;
             foreach (var e in list) Instantiate(cardPrefab, root).Set(e.sprite, e.title, e.desc);
         }
-        public void Open() { page = 0; panel.SetActive(true); IsOpen = true; Show(); }
-        public void Close() { panel.SetActive(false); IsOpen = false; closedFrame = Time.frameCount; }
+        public void Open() { page = 0; panel.SetActive(true); IsOpen = true; SetBackUi(false); Show(); }
+        public void Close() { panel.SetActive(false); IsOpen = false; closedFrame = Time.frameCount; SetBackUi(true); }
+        void SetBackUi(bool visible)
+        {
+            if (openButton) openButton.gameObject.SetActive(false);    // タイトルのメニューから開くので、旧ボタンは常に隠す
+            if (hideWhileOpen != null) foreach (var g in hideWhileOpen) if (g) g.SetActive(visible);
+        }
         void Go(int d) { page = (page + d + pages.Length) % pages.Length; Show(); }
         void Show()
         {
