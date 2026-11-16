@@ -45,7 +45,7 @@ namespace SteamEngineer
             {
                 if (gm != null)
                 {
-                    if (scene == "Title" && kb.enterKey.wasPressedThisFrame && !HelpPanel.Blocking && !LoadoutUI.Blocking && !EquipmentUI.Blocking && !AchievementUI.Blocking) gm.StartRun();
+                    if (scene == "Title" && kb.enterKey.wasPressedThisFrame && !TitleBusy()) gm.StartRun();
                     else if (scene == "Result" && kb.enterKey.wasPressedThisFrame) gm.BackToTitle();
                 }
                 if (kb.escapeKey.isPressed) { quitHold += Time.unscaledDeltaTime; if (quitHold >= quitHoldSeconds) Application.Quit(); }
@@ -78,5 +78,7 @@ namespace SteamEngineer
                 GUI.color = Color.white; GUI.Label(new Rect(24, 20, 300, 20), "RESET DONE");
             }
         }
+        static bool TitleBusy() =>
+            HelpPanel.Blocking || LoadoutUI.Blocking || EquipmentUI.Blocking || AchievementUI.Blocking || SettingsUI.Blocking || TutorialMenuUI.Blocking;
     }
 }

@@ -12,6 +12,7 @@ namespace SteamEngineer
         public float dashCost = 25f, airJumpCost = 20f;
         public Health Health { get; private set; } public PlayerStats Stats { get; private set; }
         public Rigidbody2D Body => rb; public int Facing => facing;
+        public bool Grounded => grounded;
         public int CurrentAttack => Stats.attack + GameManager.Instance.Run.AttackBonus() + LowHpBonus;
         int LowHpBonus => (Health != null && Health.Current * 2 <= Health.max) ? Mathf.RoundToInt(GameManager.Instance.Run.RelicValue(RelicEffect.LowHpAttack)) : 0;
 

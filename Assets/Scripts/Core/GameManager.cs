@@ -21,6 +21,8 @@ namespace SteamEngineer
         [Header("装備一覧(ティア上昇のハードル)")]
         public int tierUpCoreMul = 2, tierUpCommonMul = 2;
         public SaveData Save; public RunState Run;
+        public int tutorialLesson;
+        public void StartTutorial(int lesson) { tutorialLesson = lesson; Load("Tutorial"); }
 
         public float EnemyHpMul
         {

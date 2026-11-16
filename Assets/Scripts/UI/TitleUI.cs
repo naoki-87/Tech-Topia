@@ -8,7 +8,7 @@ namespace SteamEngineer
         public Transform rowRoot; public BaseRow rowPrefab;            // 旧UI(使わない。割り当てはそのままでよい)
         static readonly string[] rankNames = { "素人", "職人", "達人", "工房", "伝説" };
         static readonly Color Dark = new Color32(0x2B, 0x1D, 0x12, 255), Brass = new Color32(0xB8, 0x86, 0x0B, 255), Cream = new Color32(0xF0, 0xDC, 0xB8, 255);
-        RectTransform menu; TMP_Text toast; float toastUntil; EquipmentUI equip; HelpPanel help; AchievementUI ach;
+        RectTransform menu; TMP_Text toast; float toastUntil; EquipmentUI equip; HelpPanel help; AchievementUI ach; SettingsUI set; TutorialMenuUI tut;
 
         void Start()
         {
@@ -17,7 +17,10 @@ namespace SteamEngineer
             var canvas = info.canvas.rootCanvas;
             equip = gameObject.AddComponent<EquipmentUI>(); equip.Init(canvas);
             ach = gameObject.AddComponent<AchievementUI>(); ach.Init(canvas);
+            set = gameObject.AddComponent<SettingsUI>(); set.Init(canvas);
+            tut = gameObject.AddComponent<TutorialMenuUI>(); tut.Init(canvas);
             help = FindFirstObjectByType<HelpPanel>();
+            if (help) help.tutorialAction = () => tut.Open();
 
             var go = new GameObject("TitleMenu", typeof(RectTransform)); go.transform.SetParent(canvas.transform, false);
             menu = (RectTransform)go.transform; menu.anchorMin = Vector2.zero; menu.anchorMax = Vector2.one; menu.offsetMin = menu.offsetMax = Vector2.zero;
@@ -25,7 +28,7 @@ namespace SteamEngineer
             Big("装備一覧", -570f, () => equip.Open());
             Big("実績", -710f, () => ach.Open());
             Small("操作説明", -145f, -870f, () => { if (help) help.Open(); else Toast("操作説明が見つかりません"); });
-            Small("設定", 145f, -870f, () => Toast("設定は準備中です(次の更新で追加)"));
+            Small("設定", 145f, -870f, () => set.Open());
 
             var t = new GameObject("Toast", typeof(RectTransform), typeof(TextMeshProUGUI)); t.transform.SetParent(canvas.transform, false);
             toast = t.GetComponent<TextMeshProUGUI>(); toast.fontSize = 32; toast.color = Cream; toast.alignment = TextAlignmentOptions.Center; toast.raycastTarget = false;
@@ -51,7 +54,7 @@ namespace SteamEngineer
         {
             var sv = GameManager.Instance.Save;
             info.text = $"コア {sv.cores}   工房ランク {rankNames[Mathf.Clamp(sv.rank, 0, 4)]}   汎用素材 {sv.commonMaterials}";
-            menu.gameObject.SetActive(!HelpPanel.IsOpen && !EquipmentUI.IsOpen && !AchievementUI.IsOpen);
+            menu.gameObject.SetActive(!HelpPanel.IsOpen && !EquipmentUI.IsOpen && !AchievementUI.IsOpen && !SettingsUI.IsOpen && !TutorialMenuUI.IsOpen);
             if (toast.text != "" && Time.unscaledTime > toastUntil) toast.text = "";
         }
     }

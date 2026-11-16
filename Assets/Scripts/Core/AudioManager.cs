@@ -67,26 +67,26 @@ namespace SteamEngineer
         {
             float target = Time.unscaledTime < jingleEnd ? duckMul : 1f;      // ジングル中はBGMを下げる
             duck = Mathf.MoveTowards(duck, target, 4f * Time.unscaledDeltaTime);
-            bgm.volume = bgmVolume * fade * duck;
+            bgm.volume = bgmVolume * fade * duck * Settings.Bgm;
         }
 
         // ---- 効果音 ----
-        public static void Play(AudioClip c) { if (I != null && c != null) I.sfx.PlayOneShot(c, I.sfxVolume); }
+        public static void Play(AudioClip c) { if (I != null && c != null) I.sfx.PlayOneShot(c, I.sfxVolume * Settings.Se); }
         // ジングル: BGMを一時的に下げ、次のBGMはこの音が終わるまで始まらない
         public static void Jingle(AudioClip c)
         {
             if (I == null || c == null) return;
-            I.sfx.PlayOneShot(c, I.sfxVolume);
+            I.sfx.PlayOneShot(c, I.sfxVolume * Settings.Se);
             I.jingleEnd = Mathf.Max(I.jingleEnd, Time.unscaledTime + c.length);
         }
 
-        public static void Jump()     { Play(I != null ? I.jump : null); }
-        public static void Attack()   { Play(I != null ? I.attack : null); }
-        public static void Dash()     { Play(I != null ? I.dash : null); }
+        public static void Jump()     { TutorialEvents.Fire("jump"); Play(I != null ? I.jump : null); }
+        public static void Attack()   { TutorialEvents.Fire("attack"); Play(I != null ? I.attack : null); }
+        public static void Dash()     { TutorialEvents.Fire("dash"); Play(I != null ? I.dash : null); }
         public static void Hurt()     { Play(I != null ? I.hurt : null); }
-        public static void Kill()     { Play(I != null ? I.kill : null); }
-        public static void Ability()  { Play(I != null ? I.ability : null); }
-        public static void Repair()   { Play(I != null ? I.repair : null); }
+        public static void Kill()     { TutorialEvents.Fire("kill"); Play(I != null ? I.kill : null); }
+        public static void Ability()  { TutorialEvents.Fire("ability"); Play(I != null ? I.ability : null); }
+        public static void Repair()   { TutorialEvents.Fire("repair"); Play(I != null ? I.repair : null); }
         public static void Clear()    { Jingle(I != null ? I.clear : null); }
         public static void GameOver() { Jingle(I != null ? I.gameOver : null); }
     }

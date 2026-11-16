@@ -10,7 +10,7 @@ namespace SteamEngineer
         void OnCollisionEnter2D(Collision2D c)
         {
             if (busy || !c.collider.TryGetComponent(out PlayerController p)) return;
-            if (p.transform.position.y > transform.position.y) StartCoroutine(Fall());   // ã‚Éæ‚Á‚½‚Æ‚«‚¾‚¯
+            if (p.transform.position.y > transform.position.y) { TutorialEvents.Fire("cloud"); StartCoroutine(Fall()); }   // ã‚Éæ‚Á‚½‚Æ‚«‚¾‚¯
         }
         IEnumerator Fall()
         {

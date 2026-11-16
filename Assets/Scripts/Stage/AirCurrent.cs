@@ -13,6 +13,7 @@ namespace SteamEngineer
         {
             if (!sr) return; var c = sr.color; c.a = Active ? visibleAlpha : 0.06f; sr.color = c;
         }
+        void OnTriggerEnter2D(Collider2D other) { if (other.GetComponent<PlayerController>() != null) TutorialEvents.Fire("air"); }
         void OnTriggerStay2D(Collider2D other)
         {
             if (!Active || !other.TryGetComponent(out PlayerController p)) return;

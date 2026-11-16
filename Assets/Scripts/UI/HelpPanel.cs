@@ -7,6 +7,7 @@ namespace SteamEngineer
         [Serializable] public class Entry { public Sprite sprite; public string title; [TextArea(1, 3)] public string desc; }
 
         static int closedFrame = -1;
+        public System.Action tutorialAction; GameObject tutorialBtn;
         public static bool IsOpen { get; private set; }
         public static bool Blocking => IsOpen || Time.frameCount <= closedFrame;   // 閉じた同じフレームのEnterでスタートしないため
 
@@ -33,7 +34,19 @@ namespace SteamEngineer
             if (root == null || list == null) return;
             foreach (var e in list) Instantiate(cardPrefab, root).Set(e.sprite, e.title, e.desc);
         }
-        public void Open() { page = 0; panel.SetActive(true); IsOpen = true; SetBackUi(false); Show(); }
+        public void Open() { page = 0; panel.SetActive(true); IsOpen = true; SetBackUi(false); EnsureTutorialButton(); Show(); }
+        void EnsureTutorialButton()
+        {
+            if (tutorialAction == null || tutorialBtn != null) return;
+            var go = new GameObject("TutorialBtn", typeof(RectTransform), typeof(Image), typeof(Button)); go.transform.SetParent(panel.transform, false);
+            go.GetComponent<Image>().color = new Color32(0xB8, 0x86, 0x0B, 255);
+            var r = (RectTransform)go.transform; r.anchorMin = r.anchorMax = new Vector2(0f, 1f); r.pivot = new Vector2(0f, 1f); r.anchoredPosition = new Vector2(60f, -50f); r.sizeDelta = new Vector2(380f, 90f);
+            var tg = new GameObject("L", typeof(RectTransform), typeof(TextMeshProUGUI)); tg.transform.SetParent(go.transform, false);
+            var tm = tg.GetComponent<TextMeshProUGUI>(); tm.text = "チュートリアル"; tm.fontSize = 32; tm.color = new Color32(0x2B, 0x1D, 0x12, 255); tm.alignment = TextAlignmentOptions.Center; tm.raycastTarget = false;
+            var tr = tm.rectTransform; tr.anchorMin = Vector2.zero; tr.anchorMax = Vector2.one; tr.offsetMin = tr.offsetMax = Vector2.zero;
+            go.GetComponent<Button>().onClick.AddListener(() => { Close(); tutorialAction(); });
+            tutorialBtn = go;
+        }
         public void Close() { panel.SetActive(false); IsOpen = false; closedFrame = Time.frameCount; SetBackUi(true); }
         void SetBackUi(bool visible)
         {
