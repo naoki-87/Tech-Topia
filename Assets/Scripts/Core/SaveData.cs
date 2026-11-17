@@ -2,6 +2,10 @@ using System; using System.Collections.Generic; using System.IO; using UnityEngi
 namespace SteamEngineer
 {
     [Serializable] public class OwnedEquip { public string id; public int tier; }
+    [Serializable] public class StockEntry { public string area; public int tier; public int count; }
+    [Serializable] public class TierEntry { public string id; public int tier; }
+    [Serializable] public class StatEntry { public string key; public int value; }
+    [Serializable] public class ItemEntry { public string id; public int count; }
 
     [Serializable]
     public class SaveData
@@ -12,13 +16,12 @@ namespace SteamEngineer
         public int[] baseLevel = new int[4];    // 部位ごとの基礎強化
         public int[] startLevel = { -1, -1, -1, -1 };               // 開始レベル(-1 = 基礎レベルと同じ)
         public List<OwnedEquip> owned = new List<OwnedEquip>();     // 作成して解放した装備(初期装備は含まない)
-        [Serializable] public class StockEntry { public string area; public int tier; public int count; }
-        [Serializable] public class TierEntry { public string id; public int tier; }
-        [Serializable] public class StatEntry { public string key; public int value; }
         public string[] loadout = { "", "", "", "" };               // 部位ごとの装着指定(""=初期装備)
         public List<StockEntry> stock = new List<StockEntry>();    // 清算済みの素材(エリア×ティア)
         public List<TierEntry> tiers = new List<TierEntry>();      // 装備ごとのティア(初期装備を含む)
         public List<StatEntry> stats = new List<StatEntry>();        // 実績の記録(周回クリア数など)
+        public List<ItemEntry> items = new List<ItemEntry>();        // 作成済みの補助アイテム(次の周回に持ち込める)
+        public List<ItemEntry> carry = new List<ItemEntry>();        // 次の周回に持ち込む数
         public List<string> achieved = new List<string>();           // 達成済みの実績
         public List<string> discovered = new List<string>();         // 見つけた遺物などのコレクション
         public List<string> unlocks = new List<string>();          // 解放済みの機能・装備・エリア(段階3で使う)
@@ -44,6 +47,8 @@ namespace SteamEngineer
             if (stock == null) stock = new List<StockEntry>();
             if (tiers == null) tiers = new List<TierEntry>();
             if (stats == null) stats = new List<StatEntry>();
+            if (items == null) items = new List<ItemEntry>();
+            if (carry == null) carry = new List<ItemEntry>();
             if (achieved == null) achieved = new List<string>();
             if (discovered == null) discovered = new List<string>();
             if (unlocks == null) unlocks = new List<string>();
@@ -79,6 +84,16 @@ namespace SteamEngineer
         public void UnlockFlag(string flag) { if (!unlocks.Contains(flag)) { unlocks.Add(flag); Write(); } }
         public Tier MaxTier => Has(Unlocks.TierRank) ? (Tier)Mathf.Min(4, rank + 1) : Tier.Crude;   // 作成・ティアの上限
         public int Stat(string key) { foreach (var x in stats) if (x.key == key) return x.value; return 0; }
+        static int Get(List<ItemEntry> l, string id) { foreach (var e in l) if (e.id == id) return e.count; return 0; }
+        static void Add(List<ItemEntry> l, string id, int n)
+        {
+            foreach (var e in l) if (e.id == id) { e.count = Mathf.Max(0, e.count + n); return; }
+            if (n > 0) l.Add(new ItemEntry { id = id, count = n });
+        }
+        public int ItemOwned(string id) => Get(items, id);
+        public int ItemCarry(string id) => Get(carry, id);
+        public void AddItem(string id, int n) => Add(items, id, n);
+        public void SetCarry(string id, int n) { n = Mathf.Clamp(n, 0, Mathf.Min(ItemOwned(id), ItemManager.CarryPerKind)); foreach (var e in carry) if (e.id == id) { e.count = n; return; } if (n > 0) carry.Add(new ItemEntry { id = id, count = n }); }
         public void AddStat(string key, int n)
         {
             foreach (var x in stats) if (x.key == key) { x.value += n; return; }

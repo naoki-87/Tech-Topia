@@ -9,6 +9,7 @@ namespace SteamEngineer
         public AreaData[] allAreas;
         public EquipmentData[] starters;     // Head, Body, Legs, Weapon の順
         public RelicData[] relicPool;        // 遺物の候補(Tools > TechTopia > 遺物アセットを作成 で自動設定)
+        public ItemData[] itemPool;          // 補助アイテムの一覧(Tools > TechTopia > 補助アイテムを作成 で自動設定)
         [Header("1周の長さ")]
         public int visitsPerArea = 2;        // 各エリアを何回使うか(2エリア × 2 = 4エリア)
         public bool keepTierOnCarryOver = false;   // 次の周回で、解放済みの装備を、解放したティアのまま使うか
@@ -61,6 +62,13 @@ namespace SteamEngineer
             var lv = new int[RunState.Slots];
             for (int i = 0; i < lv.Length; i++) lv[i] = Save.StartLevel(i);
             Run = new RunState(allAreas, starters, Save, lv, visitsPerArea, FindEquipment, keepTierOnCarryOver);
+            foreach (var e in new System.Collections.Generic.List<ItemEntry>(Save.carry))
+            {
+                var it = ItemManager.Find(e.id); int n = Mathf.Min(e.count, Save.ItemOwned(e.id), ItemManager.CarryPerKind);
+                if (it == null || n <= 0) continue;
+                Save.AddItem(e.id, -n); Run.itemBag[it] = n;
+            }
+            Save.carry.Clear(); Save.Write();
             Run.RollChoices(); Load("AreaSelect");
         }
         public void ChooseArea(AreaData a) { Run.BeginArea(a); Load("Stage"); }

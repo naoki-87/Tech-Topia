@@ -34,6 +34,7 @@ namespace SteamEngineer
                 s.jumpMul += e.jumpBonus; s.moveMul += e.moveBonus;
                 if (e.passive != null) e.passive.Modify(ref s, r, r.tier[i]);
             }
+            s.maxHp += r.itemMaxHp;
             foreach (var rl in r.relics)
             switch (rl.effect)
             {

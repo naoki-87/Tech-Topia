@@ -18,6 +18,9 @@ namespace SteamEngineer
         public AreaData current;
         public int areasCleared, totalAreas, stageIndex, stagesCleared, rerolls = 1, coresCollected, hp;
         public bool won, swapped, reviveUsed;
+        public Dictionary<ItemData, int> itemBag = new Dictionary<ItemData, int>();    // 持ち込んだアイテム
+        public int itemAttack, itemMaxHp;                                              // アイテムによる、この周回だけの上昇
+        public AreaData forcedArea;                                                    // 羅針盤で指定されたエリア
         public Dictionary<(AreaData, Tier), int> mats = new Dictionary<(AreaData, Tier), int>();
         public Dictionary<EquipmentData, EquipState> stash = new Dictionary<EquipmentData, EquipState>();
         public Dictionary<PassiveBase, int> counters = new Dictionary<PassiveBase, int>();
@@ -68,13 +71,22 @@ namespace SteamEngineer
         {
             choices.Clear(); var pool = new List<AreaData>();
             foreach (var a in remaining) if (!pool.Contains(a)) pool.Add(a);          // 同じエリアは1枚にまとめる
-            for (int i = 0; i < 3 && pool.Count > 0; i++) { int k = Random.Range(0, pool.Count); choices.Add(pool[k]); pool.RemoveAt(k); }
+            if (forcedArea != null && pool.Contains(forcedArea)) { choices.Add(forcedArea); pool.Remove(forcedArea); }   // 羅針盤で指定されたエリア
+            for (int i = choices.Count; i < 3 && pool.Count > 0; i++) { int k = Random.Range(0, pool.Count); choices.Add(pool[k]); pool.RemoveAt(k); }
+        }
+        public void ForceChoice(AreaData a)
+        {
+            forcedArea = a;
+            if (choices.Contains(a)) return;
+            if (choices.Count >= 3) choices.RemoveAt(choices.Count - 1);              // 末尾の1枠を差し替える
+            choices.Insert(0, a);
         }
         public bool Reroll() { if (rerolls <= 0) return false; rerolls--; RollChoices(); return true; }
 
         // 通常ステージの抽選: 遊んだステージは重みを大きく下げる。全部遊んだら記録をリセットする
         public void BeginArea(AreaData a)
         {
+            forcedArea = null;
             current = a; stageIndex = 0; stageOrder.Clear();
             var pool = new List<GameObject>();
             foreach (var p in a.stagePrefabs) if (p != null && p != a.bossStagePrefab) pool.Add(p);
@@ -118,7 +130,7 @@ namespace SteamEngineer
             int b = 0;
             for (int i = 0; i < Slots; i++)
                 if (equipped[i] != null && equipped[i].passive != null) b += equipped[i].passive.AttackBonus(this, tier[i]);
-            return b;
+            return b + itemAttack;
         }
         public int EquipPower() { int p = 0; for (int i = 0; i < Slots; i++) p += 3 * (int)tier[i] + level[i]; return p; }
 
@@ -225,5 +237,13 @@ namespace SteamEngineer
         public float RelicValue2(RelicEffect e) { float s = 0f; foreach (var r in relics) if (r.effect == e) s += r.value2; return s; }
 
         public void Finish(bool win) { won = win; }
+        // ---------- 補助アイテム ----------
+        public int ItemCount(ItemData it) => itemBag.TryGetValue(it, out var n) ? n : 0;
+        public void ConsumeItem(ItemData it) { if (ItemCount(it) > 0) itemBag[it]--; }
+        public List<KeyValuePair<ItemData, int>> ItemList()
+        {
+            var l = new List<KeyValuePair<ItemData, int>>(itemBag);
+            l.RemoveAll(x => x.Value <= 0); l.Sort((a, b) => string.Compare(a.Key.name, b.Key.name, System.StringComparison.Ordinal)); return l;
+        }
     }
 }

@@ -60,17 +60,17 @@ namespace SteamEngineer
             var v = go.GetComponent<VerticalLayoutGroup>(); v.spacing = 10; v.childAlignment = TextAnchor.UpperCenter;
             v.childControlWidth = true; v.childControlHeight = true; v.childForceExpandWidth = true; v.childForceExpandHeight = false;
         }
-        void PlaceBottom(RectTransform r, float x) { Anchor(r, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(x, 40f), new Vector2(500f, 110f)); }
+        void PlaceBottom(RectTransform r, float x) { Anchor(r, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(x, 40f), new Vector2(420f, 110f)); }
         void BuildBottom()
         {
-            PlaceBottom((RectTransform)repairButton.transform, 0f);       // 回復は下の中央
-            PlaceBottom((RectTransform)departButton.transform, 540f);
+            PlaceBottom((RectTransform)repairButton.transform, 225f);     // 回復
+            PlaceBottom((RectTransform)departButton.transform, 675f);     // 出発
             var t = repairButton.GetComponentInChildren<TMP_Text>();
             if (t) { t.enableAutoSizing = false; t.fontSize = 32; t.text = "回復して休む\nHP +3"; t.textWrappingMode = TextWrappingModes.Normal; }
             repairButton.onClick.RemoveAllListeners(); repairButton.onClick.AddListener(DoHeal);
             departButton.onClick.RemoveAllListeners(); departButton.onClick.AddListener(GameManager.Instance.AfterGarage);
             var d = MakeButton("DetailBtn", Root, "装備詳細", 32, Brass, Dark);
-            PlaceBottom((RectTransform)d.transform, -540f); d.onClick.AddListener(OpenDetail);
+            PlaceBottom((RectTransform)d.transform, -675f); d.onClick.AddListener(OpenDetail);   // 装備詳細
         }
 
         // ---------- カード ----------

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca0ccc3a220d7fd468c4b7db516cb438, type: 3}
+  m_Name: Item_CompassAirship
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.ItemData
+  displayName: "\u30A8\u30EA\u30A2\u306E\u7F85\u91DD\u76E4\u30FB\u98DB\u884C\u8239"
+  description: "\u6B21\u306E\u30A8\u30EA\u30A2\u9078\u629E\u3067\u3001\u7121\u4EBA\u306E\u98DB\u884C\u8239\u304C\u5FC5\u305A\u5019\u88DC\u306B\u51FA\u308B"
+  effect: 5
+  value: 0
+  guideArea: {fileID: 11400000, guid: 622625bdb5694af468b53419cb433cb8, type: 2}
+  usableIn: 4
+  craftCost: 20
+  stageKey: 0
+  requireUnlock: 
+  icon: {fileID: 0}

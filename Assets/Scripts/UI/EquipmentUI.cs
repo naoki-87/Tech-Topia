@@ -11,13 +11,13 @@ namespace SteamEngineer
         static readonly string[] slotNames = { "帽子", "作業着", "安全靴", "レンチ" };
         static readonly string[] keys = { "I", "O", "P", "L" };
         static readonly string[] rankNames = { "素人", "職人", "達人", "工房", "伝説" };
-        static readonly string[] tabNames = { "装備", "作成", "ティア", "基礎強化", "素材" };
+        static readonly string[] tabNames = { "装備", "作成", "ティア", "基礎強化", "素材", "アイテム" };
         static readonly Color Cream = new Color32(0xF0, 0xDC, 0xB8, 255), Dark = new Color32(0x2B, 0x1D, 0x12, 255);
         static readonly Color Brass = new Color32(0xB8, 0x86, 0x0B, 255), BrassHi = new Color32(0xD9, 0xA5, 0x20, 255), BrassLo = new Color32(0x6B, 0x4F, 0x1D, 255);
 
         Canvas canvas; GameObject panel; TMP_Text infoText, detailText;
         RectTransform scrollRT, content; ScrollRect scroll;
-        readonly Button[] tabBtn = new Button[5];
+        readonly Button[] tabBtn = new Button[6];
         int tab; string notice = ""; EquipmentData detailEquip;
         GameManager G => GameManager.Instance; SaveData S => GameManager.Instance.Save;
         Tier MaxTier => S.MaxTier;
@@ -51,7 +51,7 @@ namespace SteamEngineer
             var bar = new GameObject("Tabs", typeof(RectTransform), typeof(HorizontalLayoutGroup)); bar.transform.SetParent(panel.transform, false);
             Anchor((RectTransform)bar.transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -182f), new Vector2(1800f, 70f));
             var h = bar.GetComponent<HorizontalLayoutGroup>(); h.spacing = 10; h.childControlWidth = true; h.childControlHeight = true; h.childForceExpandWidth = true; h.childForceExpandHeight = true;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 int id = i; tabBtn[i] = MakeButton("Tab" + i, bar.transform, tabNames[i], 32, BrassLo, Cream);
                 tabBtn[i].onClick.AddListener(() => { tab = id; scroll.verticalNormalizedPosition = 1f; Rebuild(); });
@@ -132,7 +132,7 @@ namespace SteamEngineer
             foreach (Transform c in content) { c.gameObject.SetActive(false); Destroy(c.gameObject); }
             infoText.text = $"コア {S.cores}   汎用素材 {S.commonMaterials}   工房ランク {rankNames[Mathf.Clamp(S.rank, 0, 4)]}   作成・ティアの上限 [{MaxTier.Label()}]"
                             + (notice != "" ? "\n" + notice : "");
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 tabBtn[i].GetComponent<Image>().color = i == tab ? BrassHi : BrassLo;
                 tabBtn[i].GetComponentInChildren<TMP_Text>().color = i == tab ? Dark : Cream;
@@ -147,7 +147,8 @@ namespace SteamEngineer
                 case 1: BuildCraft(); break;
                 case 2: if (S.Has(Unlocks.TierRank)) BuildTier(); else BuildLocked("main_workshop"); break;
                 case 3: if (S.Has(Unlocks.BaseEnhance)) BuildBase(); else BuildLocked("main_first"); break;
-                default: BuildMat(); break;
+                case 4: BuildMat(); break;
+                default: BuildItems(); break;
             }
             LayoutRebuilder.ForceRebuildLayoutImmediate(content); Canvas.ForceUpdateCanvases();
             scroll.verticalNormalizedPosition = Mathf.Clamp01(pos);
@@ -295,6 +296,28 @@ namespace SteamEngineer
                 AddBtn(row, "基礎+1\nコア1", S.cores > 0 && S.baseLevel[s] < MaxBase, false, () => { S.SpendCore((EquipSlot)slot); S.Write(); notice = $"{slotNames[slot]}の基礎レベルが上がった"; }, 200f);
                 AddBtn(row, "開始Lv\n-", S.StartLevel(s) > 0, false, () => { S.startLevel[slot] = Mathf.Max(0, S.StartLevel(slot) - 1); S.Write(); }, 120f);
                 AddBtn(row, "開始Lv\n+", S.StartLevel(s) < S.baseLevel[s], false, () => { S.startLevel[slot] = Mathf.Min(S.baseLevel[slot], S.StartLevel(slot) + 1); S.Write(); }, 120f);
+            }
+        }
+
+        // ---------- タブ5: アイテム(作成と持ち込み) ----------
+        void BuildItems()
+        {
+            AddHeader($"補助アイテムを、汎用素材で作ります。1周に、種類ごとに最大{ItemManager.CarryPerKind}個まで持ち込めます。使い残しは、周回の終了時に消えます", 100f);
+            if (G.itemPool == null || G.itemPool.Length == 0) { AddHeader("アイテムが設定されていません(Tools > TechTopia > 補助アイテムを作成)", 60f); return; }
+            foreach (var it in G.itemPool)
+            {
+                if (it == null) continue; var item = it;
+                bool open = string.IsNullOrEmpty(it.requireUnlock) || S.Has(it.requireUnlock);
+                int own = S.ItemOwned(it.name), carry = S.ItemCarry(it.name);
+                AddHeader($"{it.displayName}   所持 {own}   持ち込み {carry}/{ItemManager.CarryPerKind}", 48f);
+                var desc = MakeText("D", content, $"{it.description}\n使える場面: {ItemManager.WhenText(it)}", 32, Cream, TextAlignmentOptions.TopLeft);
+                desc.gameObject.AddComponent<LayoutElement>().preferredHeight = 110f;
+                var row = AddRow(96f);
+                string why = !open ? "未解放(実績)" : S.commonMaterials < it.craftCost ? $"汎用素材不足 {S.commonMaterials}/{it.craftCost}" : "";
+                AddBtn(row, $"作成\n汎用 x{it.craftCost}" + (why == "" ? "" : $"\n<color=#ff8080>{why}</color>"), why == "",
+                       false, () => { S.commonMaterials -= item.craftCost; S.AddItem(item.name, 1); notice = $"作成した: {item.displayName}"; S.Write(); }, 300f);
+                AddBtn(row, "持ち込み\n-", carry > 0, false, () => { S.SetCarry(item.name, S.ItemCarry(item.name) - 1); S.Write(); }, 200f);
+                AddBtn(row, "持ち込み\n+", carry < Mathf.Min(own, ItemManager.CarryPerKind), false, () => { S.SetCarry(item.name, S.ItemCarry(item.name) + 1); S.Write(); }, 200f);
             }
         }
 

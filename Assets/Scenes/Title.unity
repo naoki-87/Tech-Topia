@@ -1383,6 +1383,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 544f812427dbd584fb3b95eb7362104b, type: 2}
   - {fileID: 11400000, guid: 2d9daf430dd0b4e49b3b74bb0ae0cb37, type: 2}
   - {fileID: 11400000, guid: 02714ea803d445749a6e6d18b45e592c, type: 2}
+  itemPool:
+  - {fileID: 11400000, guid: f935b561acc20a74fb745d75698d2b54, type: 2}
+  - {fileID: 11400000, guid: 858b2e5169ceee546b63a1670d7c403f, type: 2}
+  - {fileID: 11400000, guid: e371e87d43dd4464d91718eb56a66a60, type: 2}
+  - {fileID: 11400000, guid: 81be3c504cc25db48a990f182e2239b3, type: 2}
+  - {fileID: 11400000, guid: 7b87052581a5a0142854dd61705197ba, type: 2}
+  - {fileID: 11400000, guid: 02abe09a409aa934ca38454a7e866c45, type: 2}
+  - {fileID: 11400000, guid: 0c322c1e7ae7e3d4fa0445283fe6821c, type: 2}
   visitsPerArea: 2
   keepTierOnCarryOver: 0
   scaleEnemies: 1
@@ -1408,7 +1416,13 @@ MonoBehaviour:
     - 
     stock: []
     tiers: []
+    stats: []
+    items: []
+    carry: []
+    achieved: []
+    discovered: []
     unlocks: []
+  tutorialLesson: 0
 --- !u!4 &819699637
 Transform:
   m_ObjectHideFlags: 0
