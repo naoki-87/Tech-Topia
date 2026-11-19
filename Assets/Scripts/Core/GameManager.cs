@@ -3,6 +3,7 @@ namespace SteamEngineer
 {
     // Title シーンに1つ置く。DontDestroyOnLoad。
     // Scenes: Title / AreaSelect / Stage / Garage / Result
+    public enum RunLength { Exhibition, Standard }     // 展示用 / 通常用
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance;
@@ -11,7 +12,7 @@ namespace SteamEngineer
         public RelicData[] relicPool;        // 遺物の候補(Tools > TechTopia > 遺物アセットを作成 で自動設定)
         public ItemData[] itemPool;          // 補助アイテムの一覧(Tools > TechTopia > 補助アイテムを作成 で自動設定)
         [Header("1周の長さ")]
-        public int visitsPerArea = 2;        // 各エリアを何回使うか(2エリア × 2 = 4エリア)
+        public int visitsPerArea = 2; public RunLength runLength = RunLength.Exhibition; public int exhibitionStages = 3, standardStages = 5;        // 各エリアを何回使うか(2エリア × 2 = 4エリア)
         public bool keepTierOnCarryOver = false;   // 次の周回で、解放済みの装備を、解放したティアのまま使うか
         [Header("敵の強さ")]
         public bool scaleEnemies = true;
@@ -61,7 +62,9 @@ namespace SteamEngineer
                 Save.commonMaterials = Mathf.Max(Save.commonMaterials, ExhibitionManager.Instance.minCommonMaterials);
             var lv = new int[RunState.Slots];
             for (int i = 0; i < lv.Length; i++) lv[i] = Save.StartLevel(i);
-            Run = new RunState(allAreas, starters, Save, lv, visitsPerArea, FindEquipment, keepTierOnCarryOver);
+            RunState.StagesPerArea = runLength == RunLength.Exhibition ? exhibitionStages : standardStages;
+            int visits = runLength == RunLength.Exhibition ? visitsPerArea : 1;
+            Run = new RunState(allAreas, starters, Save, lv, visits, FindEquipment, keepTierOnCarryOver);
             foreach (var e in new System.Collections.Generic.List<ItemEntry>(Save.carry))
             {
                 var it = ItemManager.Find(e.id); int n = Mathf.Min(e.count, Save.ItemOwned(e.id), ItemManager.CarryPerKind);

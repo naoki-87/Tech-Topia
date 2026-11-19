@@ -21,7 +21,7 @@ namespace SteamEngineer
             var gm = GameManager.Instance; var run = gm.Run;
             info.text = $"攻略 {run.areasCleared}/{run.totalAreas}   リロール残り {run.rerolls}";
             strength.text = $"現在の敵の強さ  HP ×{gm.EnemyHpMul:0.00} / 接触ダメージ +{gm.EnemyDmgBonus}\n" +
-                            $"装備パワー {run.EquipPower()} / 攻略 {run.areasCleared}エリア / 手に入る素材のティア: {run.DropTier.Label()}";
+                            $"装備パワー {run.EquipPower()} / 攻略 {run.areasCleared}エリア / 手に入る素材のティア: {TierColors.Name(run.DropTier)}";
             for (int i = 0; i < areaButtons.Length; i++)
             {
                 bool has = i < run.choices.Count; areaButtons[i].gameObject.SetActive(has); if (!has) continue;

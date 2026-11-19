@@ -66,7 +66,7 @@ namespace SteamEngineer
             {
                 if (kv.Value <= 0 || kv.Key.Item1 == null) continue;
                 AddStock(kv.Key.Item1.name, kv.Key.Item2, kv.Value);
-                sb.AppendLine($"{kv.Key.Item1.materialName}[{kv.Key.Item2.Label()}] x{kv.Value}");
+                sb.AppendLine($"{kv.Key.Item1.materialName}{TierColors.Tag(kv.Key.Item2)} x{kv.Value}");
             }
             lastSummary = (sb.Length > 0 ? "【素材を清算】\n" + sb : "【素材を清算】なし") + $"\n汎用素材 +{common}" + (win ? $"  コア +{run.coresCollected}" : "");
             AddStat("runs", 1); if (win) AddStat("runs_cleared", 1); AddStat("areas_cleared", run.areasCleared);

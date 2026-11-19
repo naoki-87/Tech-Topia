@@ -5,7 +5,7 @@ namespace SteamEngineer
 
     public class RunState
     {
-        public const int Slots = 4, StagesPerArea = 3;      // 展示用は3。変更していた場合は、その値にする
+        public const int Slots = 4; public static int StagesPerArea = 3;      // 値は GameManager の Run Length で決まる      // 展示用は3。変更していた場合は、その値にする
         const float PlayedWeight = 0.03f;                    // 遊んだステージの抽選の重み(通常は1)
 
         public EquipmentData[] equipped = new EquipmentData[Slots];

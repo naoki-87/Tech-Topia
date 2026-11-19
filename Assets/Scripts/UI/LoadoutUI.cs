@@ -1,18 +1,18 @@
 using System; using TMPro; using UnityEngine; using UnityEngine.InputSystem; using UnityEngine.SceneManagement; using UnityEngine.UI;
 namespace SteamEngineer
 {
-    // ‘•”õ•ÏXBTitle: Ÿ‚Ìü‰ñ‚É‚¿‰z‚·‘•”õ‚ğ‘I‚Ô / AreaSelect: ü‰ñ’†‚Ì‘•”õ‚ğØ‚è‘Ö‚¦‚éBUI‚ÍƒR[ƒh‚Åì‚é
-    // g‚¢•û: Title ‚Æ AreaSelect ‚Ì‹ó‚ÌƒIƒuƒWƒFƒNƒg‚É•t‚¯‚é(Canvas ‚ª•K—v)
+    // è£…å‚™å¤‰æ›´ã€‚Title: æ¬¡ã®å‘¨å›ã«æŒã¡è¶Šã™è£…å‚™ã‚’é¸ã¶ / AreaSelect: å‘¨å›ä¸­ã®è£…å‚™ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚UIã¯ã‚³ãƒ¼ãƒ‰ã§ä½œã‚‹
+    // ä½¿ã„æ–¹: Title ã¨ AreaSelect ã®ç©ºã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ä»˜ã‘ã‚‹(Canvas ãŒå¿…è¦)
     public class LoadoutUI : MonoBehaviour
     {
         static int closedFrame = -1;
         public static bool IsOpen { get; private set; }
         public static bool Blocking => IsOpen || Time.frameCount <= closedFrame;
 
-        public Vector2 buttonPos = new Vector2(-480f, 250f);     // ŠJ‚­ƒ{ƒ^ƒ“‚ÌˆÊ’u(‰º’†‰›Šî€)
-        static readonly string[] slotNames = { "–Xq", "ì‹Æ’…", "ˆÀ‘SŒC", "ƒŒƒ“ƒ`" };
-        static readonly Color Cream = new Color32(0xF0, 0xDC, 0xB8, 255), Dark = new Color32(0x2B, 0x1D, 0x12, 255);
-        static readonly Color Brass = new Color32(0xB8, 0x86, 0x0B, 255), BrassHi = new Color32(0xD9, 0xA5, 0x20, 255), BrassLo = new Color32(0x6B, 0x4F, 0x1D, 255);
+        public Vector2 buttonPos = new Vector2(-480f, 250f);     // é–‹ããƒœã‚¿ãƒ³ã®ä½ç½®(ä¸‹ä¸­å¤®åŸºæº–)
+        static readonly string[] slotNames = { "å¸½å­", "ä½œæ¥­ç€", "å®‰å…¨é´", "ãƒ¬ãƒ³ãƒ" };
+        static Color Cream => UiKit.Cream; static Color Dark => UiKit.Dark;
+        static Color Brass => UiKit.Brass; static Color BrassHi => UiKit.BrassHi; static Color BrassLo => UiKit.BrassLo;
 
         Canvas canvas; GameObject panel, openBtn; RectTransform content; TMP_Text hint; bool titleMode;
 
@@ -20,14 +20,14 @@ namespace SteamEngineer
         {
             if (SceneManager.GetActiveScene().name == "Title") { enabled = false; return; }
             var c = GetComponentInParent<Canvas>(); if (c == null) c = FindFirstObjectByType<Canvas>();
-            if (c == null) { Debug.LogError("LoadoutUI: Canvas ‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ"); return; }
+            if (c == null) { Debug.LogError("LoadoutUI: Canvas ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“"); return; }
             canvas = c.rootCanvas; titleMode = SceneManager.GetActiveScene().name == "Title";
             BuildOpenButton(); BuildPanel();
             IsOpen = false; RefreshOpenButton();
         }
         void OnDestroy() { IsOpen = false; }
 
-        // ---------- UI•”•i ----------
+        // ---------- UIéƒ¨å“ ----------
         static TMP_Text MakeText(string name, Transform parent, string text, int size, Color col, TextAlignmentOptions al)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI)); go.transform.SetParent(parent, false);
@@ -47,7 +47,7 @@ namespace SteamEngineer
 
         void BuildOpenButton()
         {
-            var b = MakeButton("LoadoutOpen", canvas.transform, "‘•”õ•ÏX", 48, Brass, Dark);
+            var b = MakeButton("LoadoutOpen", canvas.transform, "è£…å‚™å¤‰æ›´", 48, Brass, Dark);
             Anchor((RectTransform)b.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), buttonPos, new Vector2(360f, 110f));
             b.onClick.AddListener(Open); openBtn = b.gameObject;
         }
@@ -55,7 +55,7 @@ namespace SteamEngineer
         {
             panel = new GameObject("LoadoutPanel", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(canvas.transform, false);
             panel.GetComponent<Image>().color = new Color32(0x1A, 0x11, 0x0B, 255); Stretch((RectTransform)panel.transform, 0, 0);
-            var title = MakeText("Title", panel.transform, "‘•”õ•ÏX", 64, BrassHi, TextAlignmentOptions.Center);
+            var title = MakeText("Title", panel.transform, "è£…å‚™å¤‰æ›´", 64, BrassHi, TextAlignmentOptions.Center);
             Anchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0, -40), new Vector2(1500, 80));
             hint = MakeText("Hint", panel.transform, "", 32, Cream, TextAlignmentOptions.Center);
             Anchor(hint.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0, -125), new Vector2(1700, 50));
@@ -63,13 +63,13 @@ namespace SteamEngineer
             content = (RectTransform)cg.transform; Anchor(content, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0, -190), new Vector2(1700, 700));
             var v = cg.GetComponent<VerticalLayoutGroup>(); v.spacing = 6; v.childAlignment = TextAnchor.UpperCenter;
             v.childControlWidth = true; v.childControlHeight = true; v.childForceExpandWidth = true; v.childForceExpandHeight = false;
-            var close = MakeButton("Close", panel.transform, "•Â‚¶‚é", 48, Brass, Dark);
+            var close = MakeButton("Close", panel.transform, "é–‰ã˜ã‚‹", 48, Brass, Dark);
             Anchor((RectTransform)close.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0, 40), new Vector2(420, 100));
             close.onClick.AddListener(Close);
             panel.SetActive(false);
         }
 
-        // ---------- ŠJ•Â ----------
+        // ---------- é–‹é–‰ ----------
         void RefreshOpenButton()
         {
             var gm = GameManager.Instance; bool show = false;
@@ -87,7 +87,7 @@ namespace SteamEngineer
             if (k.escapeKey.wasPressedThisFrame || k.enterKey.wasPressedThisFrame || k.spaceKey.wasPressedThisFrame) Close();
         }
 
-        // ---------- ’†g ----------
+        // ---------- ä¸­èº« ----------
         void AddOption(Transform row, string line1, string line2, bool selected, Action onClick)
         {
             var b = MakeButton("Opt", row, line1 + "\n" + line2, 32, selected ? BrassHi : BrassLo, selected ? Dark : Cream);
@@ -99,7 +99,7 @@ namespace SteamEngineer
         {
             foreach (Transform c in content) Destroy(c.gameObject);
             var gm = GameManager.Instance;
-            hint.text = titleMode ? "‚±‚±‚Å‘I‚ñ‚¾‘•”õ‚ÅAŸ‚Ìü‰ñ‚ğn‚ß‚Ü‚·" : "‰Ÿ‚·‚Æ‘•”õ‚ğØ‚è‘Ö‚¦‚Ü‚·(ƒKƒŒ[ƒW‚Å‚àØ‚è‘Ö‚¦‚ç‚ê‚Ü‚·)";
+            hint.text = titleMode ? "ã“ã“ã§é¸ã‚“ã è£…å‚™ã§ã€æ¬¡ã®å‘¨å›ã‚’å§‹ã‚ã¾ã™" : "æŠ¼ã™ã¨è£…å‚™ã‚’åˆ‡ã‚Šæ›¿ãˆã¾ã™(ã‚¬ãƒ¬ãƒ¼ã‚¸ã§ã‚‚åˆ‡ã‚Šæ›¿ãˆã‚‰ã‚Œã¾ã™)";
             for (int i = 0; i < RunState.Slots; i++)
             {
                 int s = i;
@@ -113,22 +113,22 @@ namespace SteamEngineer
                 if (titleMode)
                 {
                     string cur = gm.Save.loadout[s];
-                    AddOption(rowGo.transform, cur == "" ? "‘I‘ğ’†" : "‰Šú‘•”õ", gm.starters[s].displayName, cur == "", () => Set(s, ""));
+                    AddOption(rowGo.transform, cur == "" ? "é¸æŠä¸­" : "åˆæœŸè£…å‚™", gm.starters[s].displayName, cur == "", () => Set(s, ""));
                     foreach (var o in gm.Save.owned)
                     {
                         var e = gm.FindEquipment(o.id); if (e == null || (int)e.slot != s) continue;
                         string id = o.id; string tierText = gm.keepTierOnCarryOver ? $"[{((Tier)o.tier).Label()}]" : "";
-                        AddOption(rowGo.transform, cur == id ? "‘I‘ğ’†" : "‰ğ•úÏ‚İ", e.displayName + tierText, cur == id, () => Set(s, id));
+                        AddOption(rowGo.transform, cur == id ? "é¸æŠä¸­" : "è§£æ”¾æ¸ˆã¿", e.displayName + tierText, cur == id, () => Set(s, id));
                     }
                 }
                 else
                 {
                     var run = gm.Run; var ce = run.equipped[s];
-                    AddOption(rowGo.transform, "‘•’…’†", $"{(ce ? ce.displayName : "-")}[{run.tier[s].Label()}]Lv{run.level[s]}", true, null);
+                    AddOption(rowGo.transform, "è£…ç€ä¸­", $"{(ce ? ce.displayName : "-")}[{run.tier[s].Label()}]Lv{run.level[s]}", true, null);
                     foreach (var kv in run.StashList())
                     {
                         if ((int)kv.Key.slot != s) continue; var e = kv.Key; var st = kv.Value;
-                        AddOption(rowGo.transform, "‚¿•¨", $"{e.displayName}[{st.tier.Label()}]Lv{st.level}", false, () => { run.Equip(e); Rebuild(); });
+                        AddOption(rowGo.transform, "æŒã¡ç‰©", $"{e.displayName}[{st.tier.Label()}]Lv{st.level}", false, () => { run.Equip(e); Rebuild(); });
                     }
                 }
             }

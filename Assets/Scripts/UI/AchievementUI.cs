@@ -1,16 +1,16 @@
 using System; using System.Text; using TMPro; using UnityEngine; using UnityEngine.InputSystem; using UnityEngine.UI;
 namespace SteamEngineer
 {
-    // ÀÑ‰æ–Ê: ƒƒCƒ“ƒ‹[ƒg / ƒTƒuƒ‹[ƒg / ƒRƒŒƒNƒVƒ‡ƒ“(‘•”õEˆâ•¨)
+    // å®Ÿç¸¾ç”»é¢: ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒˆ / ã‚µãƒ–ãƒ«ãƒ¼ãƒˆ / ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³(è£…å‚™ãƒ»éºç‰©)
     public class AchievementUI : MonoBehaviour
     {
         static int closedFrame = -1;
         public static bool IsOpen { get; private set; }
         public static bool Blocking => IsOpen || Time.frameCount <= closedFrame;
-        static readonly string[] tabNames = { "ƒƒCƒ“ƒ‹[ƒg", "ƒTƒuƒ‹[ƒg", "ƒRƒŒƒNƒVƒ‡ƒ“" };
-        static readonly string[] slotNames = { "–Xq", "ì‹Æ’…", "ˆÀ‘SŒC", "ƒŒƒ“ƒ`" };
-        static readonly Color Cream = new Color32(0xF0, 0xDC, 0xB8, 255), Dark = new Color32(0x2B, 0x1D, 0x12, 255);
-        static readonly Color Brass = new Color32(0xB8, 0x86, 0x0B, 255), BrassHi = new Color32(0xD9, 0xA5, 0x20, 255), BrassLo = new Color32(0x6B, 0x4F, 0x1D, 255);
+        static readonly string[] tabNames = { "ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒˆ", "ã‚µãƒ–ãƒ«ãƒ¼ãƒˆ", "ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³" };
+        static readonly string[] slotNames = { "å¸½å­", "ä½œæ¥­ç€", "å®‰å…¨é´", "ãƒ¬ãƒ³ãƒ" };
+        static Color Cream => UiKit.Cream; static Color Dark => UiKit.Dark;
+        static Color Brass => UiKit.Brass; static Color BrassHi => UiKit.BrassHi; static Color BrassLo => UiKit.BrassLo;
 
         GameObject panel; TMP_Text infoText; ScrollRect scroll; RectTransform content;
         readonly Button[] tabBtn = new Button[3]; int tab;
@@ -37,7 +37,7 @@ namespace SteamEngineer
             var canvas = c.rootCanvas;
             panel = new GameObject("AchievementPanel", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(canvas.transform, false);
             panel.GetComponent<Image>().color = new Color32(0x1A, 0x11, 0x0B, 255); Stretch((RectTransform)panel.transform, 0, 0);
-            var title = MakeText("Title", panel.transform, "ÀÑ", 64, BrassHi, TextAlignmentOptions.Center);
+            var title = MakeText("Title", panel.transform, "å®Ÿç¸¾", 64, BrassHi, TextAlignmentOptions.Center);
             Anchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(1500f, 70f));
             infoText = MakeText("Info", panel.transform, "", 32, Cream, TextAlignmentOptions.Center);
             Anchor(infoText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -96f), new Vector2(1800f, 50f));
@@ -61,7 +61,7 @@ namespace SteamEngineer
             ct.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             scroll = sgo.GetComponent<ScrollRect>(); scroll.viewport = (RectTransform)vp.transform; scroll.content = content;
             scroll.horizontal = false; scroll.vertical = true; scroll.movementType = ScrollRect.MovementType.Clamped; scroll.scrollSensitivity = 40f;
-            var close = MakeButton("Close", panel.transform, "•Â‚¶‚é", 48, Brass, Dark);
+            var close = MakeButton("Close", panel.transform, "é–‰ã˜ã‚‹", 48, Brass, Dark);
             Anchor((RectTransform)close.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(420f, 100f));
             close.onClick.AddListener(Close); panel.SetActive(false);
         }
@@ -74,7 +74,7 @@ namespace SteamEngineer
             if (!IsOpen) return; var k = Keyboard.current; if (k == null) return;
             if (k.escapeKey.wasPressedThisFrame) Close();
 #if UNITY_EDITOR
-            // ƒeƒXƒg—p(ƒGƒfƒBƒ^‚Ì‚İ): F4 = ü‰ñƒNƒŠƒA” +1 ‚µ‚ÄÀÑ‚ğ”»’è
+            // ãƒ†ã‚¹ãƒˆç”¨(ã‚¨ãƒ‡ã‚£ã‚¿ã®ã¿): F4 = å‘¨å›ã‚¯ãƒªã‚¢æ•° +1 ã—ã¦å®Ÿç¸¾ã‚’åˆ¤å®š
             if (k.f4Key.wasPressedThisFrame) { S.AddStat("runs_cleared", 1); Achievements.CheckAll(S); Rebuild(); }
 #endif
         }
@@ -93,7 +93,7 @@ namespace SteamEngineer
         {
             foreach (Transform c in content) { c.gameObject.SetActive(false); Destroy(c.gameObject); }
             int done = 0, total = Achievements.All.Count; foreach (var d in Achievements.All) if (S.IsAchieved(d.id)) done++;
-            infoText.text = $"’B¬ {done}/{total}";
+            infoText.text = $"é”æˆ {done}/{total}";
             for (int i = 0; i < 3; i++)
             {
                 tabBtn[i].GetComponent<Image>().color = i == tab ? BrassHi : BrassLo;
@@ -106,33 +106,33 @@ namespace SteamEngineer
         {
             int n = 0;
             foreach (var d in Achievements.All) { if (d.route != r) continue; AddCard(Achievements.Describe(d, S), S.IsAchieved(d.id)); n++; }
-            if (n == 0) AddHeader("‚±‚Ìƒ‹[ƒg‚ÌÀÑ‚ÍA€”õ’†‚Å‚·");
+            if (n == 0) AddHeader("ã“ã®ãƒ«ãƒ¼ãƒˆã®å®Ÿç¸¾ã¯ã€æº–å‚™ä¸­ã§ã™");
         }
         void BuildCollection()
         {
             int have = 0, all = 0; var sb = new StringBuilder();
             foreach (var s in G.starters) if (s != null) { all++; have++; }
             foreach (var a in G.allAreas) if (a != null && a.craftable != null) foreach (var e in a.craftable) if (e != null) { all++; if (Owned(e)) have++; }
-            AddHeader($"‘•”õ  {have}/{all}");
-            foreach (var s in G.starters) if (s != null) AddCard($"Ÿ {s.displayName}  ({slotNames[(int)s.slot]})  [‰Šú‘•”õ / Å‚ {S.GetTier(s.name).Label()}]", true);
+            AddHeader($"è£…å‚™  {have}/{all}");
+            foreach (var s in G.starters) if (s != null) AddCard($"â—† {s.displayName}  ({slotNames[(int)s.slot]})  [åˆæœŸè£…å‚™ / æœ€é«˜ {TierColors.Name(S.GetTier(s.name))}]", true);
             foreach (var a in G.allAreas)
             {
                 if (a == null || a.craftable == null) continue;
                 foreach (var e in a.craftable)
                 {
                     if (e == null) continue;
-                    if (Owned(e)) AddCard($"Ÿ {e.displayName}  ({slotNames[(int)e.slot]})  [Å‚ {S.GetTier(e.name).Label()}]\n{e.description}", true);
-                    else AddCard($" ???  ({slotNames[(int)e.slot]})  {a.displayName}‚Ì‘fŞ‚Åì‚ê‚é", false);
+                    if (Owned(e)) AddCard($"â—† {e.displayName}  ({slotNames[(int)e.slot]})  [æœ€é«˜ {TierColors.Name(S.GetTier(e.name))}]\n{e.description}", true);
+                    else AddCard($"â—‡ ???  ({slotNames[(int)e.slot]})  {a.displayName}ã®ç´ æã§ä½œã‚Œã‚‹", false);
                 }
             }
             int rh = 0, ra = 0;
             if (G.relicPool != null) foreach (var r in G.relicPool) if (r != null) { ra++; if (S.discovered.Contains("relic:" + r.name)) rh++; }
-            AddHeader($"ˆâ•¨  {rh}/{ra}");
+            AddHeader($"éºç‰©  {rh}/{ra}");
             if (G.relicPool != null)
                 foreach (var r in G.relicPool)
                 {
                     if (r == null) continue;
-                    if (S.discovered.Contains("relic:" + r.name)) AddCard($"Ÿ {r.displayName}\n{r.description}", true); else AddCard(" ???", false);
+                    if (S.discovered.Contains("relic:" + r.name)) AddCard($"â—† {r.displayName}\n{r.description}", true); else AddCard("â—‡ ???", false);
                 }
         }
         bool Owned(EquipmentData e) { foreach (var o in S.owned) if (o.id == e.name) return true; return false; }

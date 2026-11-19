@@ -11,9 +11,9 @@ namespace SteamEngineer
         static readonly string[] slotNames = { "帽子", "作業着", "安全靴", "レンチ" };
         static readonly string[] keys = { "I", "O", "P", "L" };
         static readonly string[] rankNames = { "素人", "職人", "達人", "工房", "伝説" };
-        static readonly Color Cream = new Color32(0xF0, 0xDC, 0xB8, 255), Dark = new Color32(0x2B, 0x1D, 0x12, 255);
-        static readonly Color Brass = new Color32(0xB8, 0x86, 0x0B, 255), BrassHi = new Color32(0xD9, 0xA5, 0x20, 255), BrassLo = new Color32(0x6B, 0x4F, 0x1D, 255);
-        static readonly Color Slate = new Color32(0x3A, 0x4A, 0x5C, 255);
+        static Color Cream => UiKit.Cream; static Color Dark => UiKit.Dark;
+        static Color Brass => UiKit.Brass; static Color BrassHi => UiKit.BrassHi; static Color BrassLo => UiKit.BrassLo;
+        static Color Slate => UiKit.Slate;
 
         bool used; string notice = ""; int detailTab; int[] upSlots;
         RectTransform main; GameObject detailPanel; TMP_Text detailText;
@@ -112,7 +112,7 @@ namespace SteamEngineer
         }
         string UpgradeCardText(RunState run, int s, bool compact)
         {
-            var e = run.equipped[s]; string name = e ? e.displayName : "-";
+            var e = run.equipped[s]; string name = e ? e.displayName + " " + TierColors.Tag(run.tier[s]) : "-";
             string lv = $"Lv{run.level[s]} → Lv{run.level[s] + 1}";
             if (compact) return $"<color=#FFD060>強化 / {slotNames[s]}</color>  <color=#FFE9A8>{lv}</color>\n{name}\n{UpgradeInfo(run, s)}";
             return $"<color=#FFD060>強化 / {slotNames[s]}</color>\n<size=48>{name}</size>\n<size=48><color=#FFE9A8>{lv}</color></size>\n{UpgradeInfo(run, s)}\n<color=#9FD8FF>選ぶとHPが1回復</color>";
@@ -219,7 +219,7 @@ namespace SteamEngineer
                 foreach (var a in gm.allAreas)
                 {
                     var line = new StringBuilder();
-                    for (int t = 0; t < 5; t++) { int n = run.Mat(a, (Tier)t); if (n > 0) line.Append($"{((Tier)t).Label()}x{n} "); }
+                    for (int t = 0; t < 5; t++) { int n = run.Mat(a, (Tier)t); if (n > 0) line.Append(TierColors.Rich((Tier)t, $"{((Tier)t).Label()}x{n}") + " "); }
                     if (line.Length > 0) { sb.AppendLine($"{a.materialName}: {line}"); any = true; }
                 }
                 if (!any) sb.AppendLine("なし");
@@ -232,7 +232,7 @@ namespace SteamEngineer
                 if (e == null) sb.AppendLine("装備なし");
                 else
                 {
-                    sb.AppendLine($"{e.displayName}  [{run.tier[s].Label()}]  Lv{run.level[s]}"); sb.AppendLine();
+                    sb.AppendLine($"{e.displayName}  {TierColors.Tag(run.tier[s])}  Lv{run.level[s]}"); sb.AppendLine();
                     sb.AppendLine("数値: " + EquipStats(run, s)); sb.AppendLine();
                     if (e.passive != null) sb.AppendLine($"特性: {e.passive.displayName}\n  {e.passive.Describe(run.tier[s])}"); else sb.AppendLine("特性: なし");
                     sb.AppendLine();
@@ -240,7 +240,7 @@ namespace SteamEngineer
                     else sb.AppendLine("アクション: なし");
                 }
                 var names = new List<string>();
-                foreach (var kv in run.StashList()) if ((int)kv.Key.slot == s) names.Add($"{kv.Key.displayName}[{kv.Value.tier.Label()}]Lv{kv.Value.level}");
+                foreach (var kv in run.StashList()) if ((int)kv.Key.slot == s) names.Add($"{kv.Key.displayName}{TierColors.Tag(kv.Value.tier)}Lv{kv.Value.level}");
                 sb.AppendLine(); sb.AppendLine("持ち物: " + (names.Count == 0 ? "なし" : string.Join(" / ", names)));
             }
             detailText.text = sb.ToString();

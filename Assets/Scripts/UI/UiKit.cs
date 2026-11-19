@@ -1,12 +1,13 @@
 using TMPro; using UnityEngine; using UnityEngine.UI;
 namespace SteamEngineer
 {
-    // ƒR[ƒh‚ÅUI‚ğì‚é‚Æ‚«‚Ì‹¤’Ê•”•i
+    // ã‚³ãƒ¼ãƒ‰ã§UIã‚’ä½œã‚‹ã¨ãã®å…±é€šéƒ¨å“
     public static class UiKit
     {
         public static readonly Color Cream = new Color32(0xF0, 0xDC, 0xB8, 255), Dark = new Color32(0x2B, 0x1D, 0x12, 255);
         public static readonly Color Brass = new Color32(0xB8, 0x86, 0x0B, 255), BrassHi = new Color32(0xD9, 0xA5, 0x20, 255);
         public static readonly Color BrassLo = new Color32(0x6B, 0x4F, 0x1D, 255), Back = new Color32(0x1A, 0x11, 0x0B, 255);
+        public static readonly Color Slate = new Color32(0x3A, 0x4A, 0x5C, 255);
 
         public static TMP_Text Txt(Transform parent, string text, int size, Color col, TextAlignmentOptions al, string name = "T")
         {

@@ -1,19 +1,19 @@
 using System; using System.Collections.Generic; using System.Text; using TMPro; using UnityEngine; using UnityEngine.InputSystem; using UnityEngine.UI;
 namespace SteamEngineer
 {
-    // ‘•”õˆê——: ‘•”õ / ì¬ / ƒeƒBƒA / Šî‘b‹­‰» / ‘fŞB´ZÏ‚İ‚Ì‘fŞ(İŒÉ)‚ğg‚¤
+    // è£…å‚™ä¸€è¦§: è£…å‚™ / ä½œæˆ / ãƒ†ã‚£ã‚¢ / åŸºç¤å¼·åŒ– / ç´ æã€‚æ¸…ç®—æ¸ˆã¿ã®ç´ æ(åœ¨åº«)ã‚’ä½¿ã†
     public class EquipmentUI : MonoBehaviour
     {
         static int closedFrame = -1;
         public static bool IsOpen { get; private set; }
         public static bool Blocking => IsOpen || Time.frameCount <= closedFrame;
         const int MaxBase = 10;
-        static readonly string[] slotNames = { "–Xq", "ì‹Æ’…", "ˆÀ‘SŒC", "ƒŒƒ“ƒ`" };
+        static readonly string[] slotNames = { "å¸½å­", "ä½œæ¥­ç€", "å®‰å…¨é´", "ãƒ¬ãƒ³ãƒ" };
         static readonly string[] keys = { "I", "O", "P", "L" };
-        static readonly string[] rankNames = { "‘fl", "El", "’Bl", "H–[", "“`à" };
-        static readonly string[] tabNames = { "‘•”õ", "ì¬", "ƒeƒBƒA", "Šî‘b‹­‰»", "‘fŞ", "ƒAƒCƒeƒ€" };
-        static readonly Color Cream = new Color32(0xF0, 0xDC, 0xB8, 255), Dark = new Color32(0x2B, 0x1D, 0x12, 255);
-        static readonly Color Brass = new Color32(0xB8, 0x86, 0x0B, 255), BrassHi = new Color32(0xD9, 0xA5, 0x20, 255), BrassLo = new Color32(0x6B, 0x4F, 0x1D, 255);
+        static readonly string[] rankNames = { "ç´ äºº", "è·äºº", "é”äºº", "å·¥æˆ¿", "ä¼èª¬" };
+        static readonly string[] tabNames = { "è£…å‚™", "ä½œæˆ", "ãƒ†ã‚£ã‚¢", "åŸºç¤å¼·åŒ–", "ç´ æ", "ã‚¢ã‚¤ãƒ†ãƒ " };
+        static Color Cream => UiKit.Cream; static Color Dark => UiKit.Dark;
+        static Color Brass => UiKit.Brass; static Color BrassHi => UiKit.BrassHi; static Color BrassLo => UiKit.BrassLo;
 
         Canvas canvas; GameObject panel; TMP_Text infoText, detailText;
         RectTransform scrollRT, content; ScrollRect scroll;
@@ -22,7 +22,7 @@ namespace SteamEngineer
         GameManager G => GameManager.Instance; SaveData S => GameManager.Instance.Save;
         Tier MaxTier => S.MaxTier;
 
-        // ---------- UI•”•i ----------
+        // ---------- UIéƒ¨å“ ----------
         static TMP_Text MakeText(string name, Transform parent, string text, int size, Color col, TextAlignmentOptions al)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI)); go.transform.SetParent(parent, false);
@@ -44,7 +44,7 @@ namespace SteamEngineer
             canvas = c.rootCanvas;
             panel = new GameObject("EquipmentPanel", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(canvas.transform, false);
             panel.GetComponent<Image>().color = new Color32(0x1A, 0x11, 0x0B, 255); Stretch((RectTransform)panel.transform, 0, 0);
-            var title = MakeText("Title", panel.transform, "‘•”õˆê——", 64, BrassHi, TextAlignmentOptions.Center);
+            var title = MakeText("Title", panel.transform, "è£…å‚™ä¸€è¦§", 64, BrassHi, TextAlignmentOptions.Center);
             Anchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(1500f, 70f));
             infoText = MakeText("Info", panel.transform, "", 32, Cream, TextAlignmentOptions.Center);
             Anchor(infoText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -96f), new Vector2(1800f, 80f));
@@ -59,7 +59,7 @@ namespace SteamEngineer
             BuildScroll(panel.transform);
             detailText = MakeText("Detail", panel.transform, "", 32, Cream, TextAlignmentOptions.TopLeft);
             Anchor(detailText.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-60f, -265f), new Vector2(680f, 740f));
-            var close = MakeButton("Close", panel.transform, "•Â‚¶‚é", 48, Brass, Dark);
+            var close = MakeButton("Close", panel.transform, "é–‰ã˜ã‚‹", 48, Brass, Dark);
             Anchor((RectTransform)close.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(420f, 100f));
             close.onClick.AddListener(Close);
             panel.SetActive(false);
@@ -80,7 +80,7 @@ namespace SteamEngineer
             scroll.horizontal = false; scroll.vertical = true; scroll.movementType = ScrollRect.MovementType.Clamped; scroll.scrollSensitivity = 40f;
         }
 
-        // ---------- €–Ú‚Ì’Ç‰Á ----------
+        // ---------- é …ç›®ã®è¿½åŠ  ----------
         void AddHeader(string text, float h = 56f)
         {
             var t = MakeText("Header", content, text, 32, BrassHi, TextAlignmentOptions.Left);
@@ -109,7 +109,7 @@ namespace SteamEngineer
             b.GetComponent<LayoutElement>().preferredHeight = 96f;
         }
 
-        // ---------- ŠJ•Â ----------
+        // ---------- é–‹é–‰ ----------
         public void Open() { tab = 0; detailEquip = null; notice = ""; panel.SetActive(true); panel.transform.SetAsLastSibling(); IsOpen = true; scroll.verticalNormalizedPosition = 1f; Rebuild(); }
         void Close() { panel.SetActive(false); IsOpen = false; closedFrame = Time.frameCount; S.Write(); }
         void OnDestroy() { IsOpen = false; }
@@ -118,7 +118,7 @@ namespace SteamEngineer
             if (!IsOpen) return; var k = Keyboard.current; if (k == null) return;
             if (k.escapeKey.wasPressedThisFrame) Close();
 #if UNITY_EDITOR
-            // ƒeƒXƒg—p(ƒGƒfƒBƒ^‚Ì‚İ): F1=”Ä—p‘fŞ+50 / F2=‘SƒGƒŠƒA‚Ì‘fŞ‚ğİŒÉ‚É’Ç‰Á / F3=H–[ƒ‰ƒ“ƒN+1
+            // ãƒ†ã‚¹ãƒˆç”¨(ã‚¨ãƒ‡ã‚£ã‚¿ã®ã¿): F1=æ±ç”¨ç´ æ+50 / F2=å…¨ã‚¨ãƒªã‚¢ã®ç´ æã‚’åœ¨åº«ã«è¿½åŠ  / F3=å·¥æˆ¿ãƒ©ãƒ³ã‚¯+1
             if (k.f1Key.wasPressedThisFrame) { S.commonMaterials += 50; Rebuild(); }
             if (k.f2Key.wasPressedThisFrame)
             { foreach (var a in G.allAreas) { S.AddStock(a.name, Tier.Crude, 12); S.AddStock(a.name, Tier.Common, 9); S.AddStock(a.name, Tier.Refined, 6); } Rebuild(); }
@@ -130,15 +130,15 @@ namespace SteamEngineer
         {
             float pos = scroll.verticalNormalizedPosition;
             foreach (Transform c in content) { c.gameObject.SetActive(false); Destroy(c.gameObject); }
-            infoText.text = $"ƒRƒA {S.cores}   ”Ä—p‘fŞ {S.commonMaterials}   H–[ƒ‰ƒ“ƒN {rankNames[Mathf.Clamp(S.rank, 0, 4)]}   ì¬EƒeƒBƒA‚ÌãŒÀ [{MaxTier.Label()}]"
+            infoText.text = $"ã‚³ã‚¢ {S.cores}   æ±ç”¨ç´ æ {S.commonMaterials}   å·¥æˆ¿ãƒ©ãƒ³ã‚¯ {rankNames[Mathf.Clamp(S.rank, 0, 4)]}   ä½œæˆãƒ»ãƒ†ã‚£ã‚¢ã®ä¸Šé™ [{MaxTier.Label()}]"
                             + (notice != "" ? "\n" + notice : "");
             for (int i = 0; i < 6; i++)
             {
                 tabBtn[i].GetComponent<Image>().color = i == tab ? BrassHi : BrassLo;
                 tabBtn[i].GetComponentInChildren<TMP_Text>().color = i == tab ? Dark : Cream;
             }
-            tabBtn[2].GetComponentInChildren<TMP_Text>().text = S.Has(Unlocks.TierRank) ? tabNames[2] : tabNames[2] + "(–¢‰ğ•ú)";
-            tabBtn[3].GetComponentInChildren<TMP_Text>().text = S.Has(Unlocks.BaseEnhance) ? tabNames[3] : tabNames[3] + "(–¢‰ğ•ú)";
+            tabBtn[2].GetComponentInChildren<TMP_Text>().text = S.Has(Unlocks.TierRank) ? tabNames[2] : tabNames[2] + "(æœªè§£æ”¾)";
+            tabBtn[3].GetComponentInChildren<TMP_Text>().text = S.Has(Unlocks.BaseEnhance) ? tabNames[3] : tabNames[3] + "(æœªè§£æ”¾)";
             scrollRT.offsetMin = new Vector2(60f, 170f); scrollRT.offsetMax = new Vector2(tab == 0 ? -760f : -60f, -265f);
             detailText.gameObject.SetActive(tab == 0);
             switch (tab)
@@ -156,67 +156,67 @@ namespace SteamEngineer
 
         bool Owns(EquipmentData e) { foreach (var o in S.owned) if (o.id == e.name) return true; return false; }
 
-        // ---------- ƒ^ƒu0: ‘•”õ(‘•’…‚Ì•ÏX) ----------
+        // ---------- ã‚¿ãƒ–0: è£…å‚™(è£…ç€ã®å¤‰æ›´) ----------
         void BuildEquip()
         {
             for (int s = 0; s < 4; s++)
             {
                 int slot = s; var starter = G.starters[s]; string cur = S.loadout[s];
                 var curEq = cur == "" ? starter : (G.FindEquipment(cur) ?? starter);
-                AddHeader($"{slotNames[s]}   ‘•’…’†: {curEq.displayName}[{S.GetTier(curEq.name).Label()}]   Šî‘bLv {S.baseLevel[s]}");
+                AddHeader($"{slotNames[s]}   è£…ç€ä¸­: {curEq.displayName}{TierColors.Tag(S.GetTier(curEq.name))}   åŸºç¤Lv {S.baseLevel[s]}");
                 var row = AddRow(96f);
-                AddBtn(row, $"‰Šú‘•”õ\n{starter.displayName}[{S.GetTier(starter.name).Label()}]", true, cur == "", () => Pick(slot, "", starter));
+                AddBtn(row, $"åˆæœŸè£…å‚™\n{starter.displayName}{TierColors.Tag(S.GetTier(starter.name), cur == "")}", true, cur == "", () => Pick(slot, "", starter));
                 foreach (var o in S.owned)
                 {
                     var e = G.FindEquipment(o.id); if (e == null || (int)e.slot != s) continue;
                     string id = o.id; var eq = e;
-                    AddBtn(row, $"‰ğ•úÏ‚İ\n{e.displayName}[{S.GetTier(e.name).Label()}]", true, cur == id, () => Pick(slot, id, eq));
+                    AddBtn(row, $"è§£æ”¾æ¸ˆã¿\n{e.displayName}{TierColors.Tag(S.GetTier(e.name), cur == id)}", true, cur == id, () => Pick(slot, id, eq));
                 }
             }
         }
         void Pick(int slot, string id, EquipmentData e)
         {
-            S.loadout[slot] = id; S.Write(); detailEquip = e; notice = $"{slotNames[slot]}: {e.displayName} ‚ğ‘•’…‚µ‚Ü‚·(Ÿ‚Ìü‰ñ‚©‚ç)";
+            S.loadout[slot] = id; S.Write(); detailEquip = e; notice = $"{slotNames[slot]}: {e.displayName} ã‚’è£…ç€ã—ã¾ã™(æ¬¡ã®å‘¨å›ã‹ã‚‰)";
         }
         static string StatsText(EquipmentData e, Tier t, int level, int rank)
         {
             float m = PlayerStats.TierMul(t); float lv = level * (1f + 0.2f * rank); var l = new List<string>();
             int hp = Mathf.RoundToInt((e.hpBase + e.hpPerLevel * lv) * m); if (hp != 0) l.Add($"HP+{hp}");
-            float dr = (e.dmgRedBase + e.dmgRedPerLevel * lv) * m; if (dr > 0.0001f) l.Add($"ŒyŒ¸+{dr * 100f:0}%");
-            int at = Mathf.RoundToInt((e.attackBase + e.attackPerLevel * lv) * m); if (at != 0) l.Add($"UŒ‚+{at}");
-            float en = (e.energyMaxBase + e.energyMaxPerLevel * lv) * m; if (en > 0.01f) l.Add($"ENÅ‘å+{en:0}");
-            float rg = (e.regenBase + e.regenPerLevel * lv) * m; if (rg > 0.01f) l.Add($"EN‰ñ•œ+{rg:0.#}/•b");
-            float cr = e.costReducePerLevel * lv; if (cr > 0.0001f) l.Add($"Á”ï-{cr * 100f:0}%");
-            if (e.extraJumps > 0) l.Add($"‹ó’†ƒWƒƒƒ“ƒv+{e.extraJumps}");
-            if (e.jumpBonus > 0.0001f) l.Add($"ƒWƒƒƒ“ƒv+{e.jumpBonus * 100f:0}%");
-            if (e.moveBonus > 0.0001f) l.Add($"ˆÚ“®+{e.moveBonus * 100f:0}%");
-            return l.Count == 0 ? "(”’l‚Ì‹­‰»‚È‚µ)" : string.Join("  ", l);
+            float dr = (e.dmgRedBase + e.dmgRedPerLevel * lv) * m; if (dr > 0.0001f) l.Add($"è»½æ¸›+{dr * 100f:0}%");
+            int at = Mathf.RoundToInt((e.attackBase + e.attackPerLevel * lv) * m); if (at != 0) l.Add($"æ”»æ’ƒ+{at}");
+            float en = (e.energyMaxBase + e.energyMaxPerLevel * lv) * m; if (en > 0.01f) l.Add($"ENæœ€å¤§+{en:0}");
+            float rg = (e.regenBase + e.regenPerLevel * lv) * m; if (rg > 0.01f) l.Add($"ENå›å¾©+{rg:0.#}/ç§’");
+            float cr = e.costReducePerLevel * lv; if (cr > 0.0001f) l.Add($"æ¶ˆè²»-{cr * 100f:0}%");
+            if (e.extraJumps > 0) l.Add($"ç©ºä¸­ã‚¸ãƒ£ãƒ³ãƒ—+{e.extraJumps}");
+            if (e.jumpBonus > 0.0001f) l.Add($"ã‚¸ãƒ£ãƒ³ãƒ—+{e.jumpBonus * 100f:0}%");
+            if (e.moveBonus > 0.0001f) l.Add($"ç§»å‹•+{e.moveBonus * 100f:0}%");
+            return l.Count == 0 ? "(æ•°å€¤ã®å¼·åŒ–ãªã—)" : string.Join("  ", l);
         }
         string DetailOf(EquipmentData e)
         {
-            if (e == null) return "<color=#D9A520>‘•”õ‚Ìà–¾</color>\n‘•”õ‚Ìƒ{ƒ^ƒ“‚ğ‰Ÿ‚·‚ÆA‘•’…‚µ‚ÄA‚±‚±‚Éà–¾‚ªo‚Ü‚·B";
+            if (e == null) return "<color=#D9A520>è£…å‚™ã®èª¬æ˜</color>\nè£…å‚™ã®ãƒœã‚¿ãƒ³ã‚’æŠ¼ã™ã¨ã€è£…ç€ã—ã¦ã€ã“ã“ã«èª¬æ˜ãŒå‡ºã¾ã™ã€‚";
             var t = S.GetTier(e.name); int lv = S.StartLevel((int)e.slot); var sb = new StringBuilder();
-            sb.AppendLine($"<color=#D9A520>{e.displayName}</color>  [{t.Label()}]  {slotNames[(int)e.slot]}");
-            sb.AppendLine(e.isStarter ? "“üè: ‰Šú‘•”õ" : $"“üè: {(e.sourceArea ? e.sourceArea.displayName : "-")}‚Ì‘fŞ‚Åì¬");
+            sb.AppendLine($"<color=#D9A520>{e.displayName}</color>  {TierColors.Tag(t)}  {slotNames[(int)e.slot]}");
+            sb.AppendLine(e.isStarter ? "å…¥æ‰‹: åˆæœŸè£…å‚™" : $"å…¥æ‰‹: {(e.sourceArea ? e.sourceArea.displayName : "-")}ã®ç´ æã§ä½œæˆ");
             if (!string.IsNullOrEmpty(e.description)) sb.AppendLine("\n" + e.description);
-            sb.AppendLine($"\n”’l(ŠJnLv{lv}): " + StatsText(e, t, lv, S.rank));
-            if (e.passive != null) sb.AppendLine($"\n“Á«: {e.passive.displayName}\n{e.passive.Describe(t)}");
-            if (e.ability != null) sb.AppendLine($"\nƒAƒNƒVƒ‡ƒ“[{keys[(int)e.slot]}]: {e.ability.displayName}\nÁ”ïEN{e.ability.energyCost:0} / CT{e.ability.cooldown:0.#}•b");
+            sb.AppendLine($"\næ•°å€¤(é–‹å§‹Lv{lv}): " + StatsText(e, t, lv, S.rank));
+            if (e.passive != null) sb.AppendLine($"\nç‰¹æ€§: {e.passive.displayName}\n{e.passive.Describe(t)}");
+            if (e.ability != null) sb.AppendLine($"\nã‚¢ã‚¯ã‚·ãƒ§ãƒ³[{keys[(int)e.slot]}]: {e.ability.displayName}\næ¶ˆè²»EN{e.ability.energyCost:0} / CT{e.ability.cooldown:0.#}ç§’");
             return sb.ToString();
         }
 
-        // ---------- ƒ^ƒu1: ì¬ ----------
+        // ---------- ã‚¿ãƒ–1: ä½œæˆ ----------
         int CraftCommon(EquipmentData e, Tier t) => e.commonCost * ((int)t + 1);
         string CraftWhy(AreaData a, EquipmentData e, Tier t)
         {
-            if (t > MaxTier) return S.Has(Unlocks.TierRank) ? "H–[ƒ‰ƒ“ƒN•s‘«" : "ãˆÊ‚ÌƒeƒBƒA‚Í–¢‰ğ•ú(ÀÑ)";
-            int have = S.Stock(a.name, t); if (have < e.coreCost) return $"‘fŞ•s‘« {have}/{e.coreCost}";
-            int need = CraftCommon(e, t); if (S.commonMaterials < need) return $"”Ä—p‘fŞ•s‘« {S.commonMaterials}/{need}";
+            if (t > MaxTier) return S.Has(Unlocks.TierRank) ? "å·¥æˆ¿ãƒ©ãƒ³ã‚¯ä¸è¶³" : "ä¸Šä½ã®ãƒ†ã‚£ã‚¢ã¯æœªè§£æ”¾(å®Ÿç¸¾)";
+            int have = S.Stock(a.name, t); if (have < e.coreCost) return $"ç´ æä¸è¶³ {have}/{e.coreCost}";
+            int need = CraftCommon(e, t); if (S.commonMaterials < need) return $"æ±ç”¨ç´ æä¸è¶³ {S.commonMaterials}/{need}";
             return "";
         }
         void BuildCraft()
         {
-            AddHeader("‘fŞ‚Æ”Ä—p‘fŞ‚ÅAV‚µ‚¢‘•”õ‚ğì‚è‚Ü‚·Bì‚Á‚½‘•”õ‚Íu‘•”õvƒ^ƒu‚Å‘•’…‚Å‚«‚Ü‚·", 90f);
+            AddHeader("ç´ æã¨æ±ç”¨ç´ æã§ã€æ–°ã—ã„è£…å‚™ã‚’ä½œã‚Šã¾ã™ã€‚ä½œã£ãŸè£…å‚™ã¯ã€Œè£…å‚™ã€ã‚¿ãƒ–ã§è£…ç€ã§ãã¾ã™", 90f);
             int n = 0;
             foreach (var a in G.allAreas)
             {
@@ -227,45 +227,45 @@ namespace SteamEngineer
                     for (int t = 0; t <= (int)MaxTier; t++)
                     {
                         var tr = (Tier)t; var eq = e; var ar = a;
-                        if (t > 0 && S.Stock(a.name, tr) <= 0) continue;           // ‘eG‚Íí‚É•\¦AãˆÊ‚Í‘fŞ‚ª‚ ‚é‚Æ‚«‚¾‚¯
+                        if (t > 0 && S.Stock(a.name, tr) <= 0) continue;           // ç²—é›‘ã¯å¸¸ã«è¡¨ç¤ºã€ä¸Šä½ã¯ç´ æãŒã‚ã‚‹ã¨ãã ã‘
                         string why = CraftWhy(a, eq, tr);
-                        AddEntry($"ì¬ {eq.displayName}[{tr.Label()}] ({slotNames[(int)eq.slot]})  {a.materialName}[{tr.Label()}]x{eq.coreCost} + ”Ä—px{CraftCommon(eq, tr)}"
+                        AddEntry($"ä½œæˆ {eq.displayName}{TierColors.Tag(tr)} ({slotNames[(int)eq.slot]})  {a.materialName}{TierColors.Tag(tr)}x{eq.coreCost} + æ±ç”¨x{CraftCommon(eq, tr)}"
                                  + (why == "" ? "" : "\n<color=#ff8080>" + why + "</color>"), why == "", () => DoCraft(ar, eq, tr)); n++;
                     }
                 }
             }
-            if (n == 0) AddHeader("ì¬‚Å‚«‚é‘•”õ‚Í‚ ‚è‚Ü‚¹‚ñ", 60f);
+            if (n == 0) AddHeader("ä½œæˆã§ãã‚‹è£…å‚™ã¯ã‚ã‚Šã¾ã›ã‚“", 60f);
         }
         void DoCraft(AreaData a, EquipmentData e, Tier t)
         {
             if (CraftWhy(a, e, t) != "") return;
             S.AddStock(a.name, t, -e.coreCost); S.commonMaterials -= CraftCommon(e, t); S.Unlock(e, t);
-            notice = $"ì¬‚µ‚½: {e.displayName}[{t.Label()}]"; S.Write();
+            notice = $"ä½œæˆã—ãŸ: {e.displayName}[{t.Label()}]"; S.Write();
         }
 
-        // ---------- ƒ^ƒu2: ƒeƒBƒAã¸ ----------
+        // ---------- ã‚¿ãƒ–2: ãƒ†ã‚£ã‚¢ä¸Šæ˜‡ ----------
         int TierCore(EquipmentData e) => e.coreCost * Mathf.Max(1, G.tierUpCoreMul);
         int TierCommon(EquipmentData e, Tier next) => e.commonCost * ((int)next + 1) * Mathf.Max(1, G.tierUpCommonMul);
         string TierWhy(EquipmentData e, Tier next)
         {
-            if (e.sourceArea == null) return "Source Area ‚ª–¢İ’è";
-            if (next > MaxTier) return "H–[ƒ‰ƒ“ƒN•s‘«(ÀÑ‚Å‰ğ•ú)";
-            int have = S.Stock(e.sourceArea.name, next), core = TierCore(e); if (have < core) return $"‘fŞ•s‘« {have}/{core}";
-            int com = TierCommon(e, next); if (S.commonMaterials < com) return $"”Ä—p‘fŞ•s‘« {S.commonMaterials}/{com}";
+            if (e.sourceArea == null) return "Source Area ãŒæœªè¨­å®š";
+            if (next > MaxTier) return "å·¥æˆ¿ãƒ©ãƒ³ã‚¯ä¸è¶³(å®Ÿç¸¾ã§è§£æ”¾)";
+            int have = S.Stock(e.sourceArea.name, next), core = TierCore(e); if (have < core) return $"ç´ æä¸è¶³ {have}/{core}";
+            int com = TierCommon(e, next); if (S.commonMaterials < com) return $"æ±ç”¨ç´ æä¸è¶³ {S.commonMaterials}/{com}";
             return "";
         }
         void BuildTier()
         {
-            AddHeader("‘•”õ‚ÌƒeƒBƒA‚ğã‚°‚Ü‚·BŸ‚ÌƒeƒBƒA‚Ì‘fŞ‚ª•K—v‚Å‚·(ì¬‚æ‚èd‚¢”ï—p)", 90f);
+            AddHeader("è£…å‚™ã®ãƒ†ã‚£ã‚¢ã‚’ä¸Šã’ã¾ã™ã€‚æ¬¡ã®ãƒ†ã‚£ã‚¢ã®ç´ æãŒå¿…è¦ã§ã™(ä½œæˆã‚ˆã‚Šé‡ã„è²»ç”¨)", 90f);
             var list = new List<EquipmentData>(); foreach (var s in G.starters) if (s != null) list.Add(s);
             foreach (var o in S.owned) { var e = G.FindEquipment(o.id); if (e != null) list.Add(e); }
             foreach (var e in list)
             {
                 var eq = e; var t = S.GetTier(e.name); string head = $"{slotNames[(int)e.slot]} {e.displayName}";
-                if (t == Tier.Supreme) { AddEntry($"{head} [{t.Label()}]  Å‚‚ÌƒeƒBƒA‚Å‚·", false, null); continue; }
+                if (t == Tier.Supreme) { AddEntry($"{head} {TierColors.Tag(t)}  æœ€é«˜ã®ãƒ†ã‚£ã‚¢ã§ã™", false, null); continue; }
                 var next = t + 1; string why = TierWhy(e, next);
                 string mat = e.sourceArea ? e.sourceArea.materialName : "?";
-                AddEntry($"{head} [{t.Label()}¨{next.Label()}]  {mat}[{next.Label()}]x{TierCore(e)} + ”Ä—px{TierCommon(e, next)}"
+                AddEntry($"{head} {TierColors.Tag(t)}â†’{TierColors.Tag(next)}  {mat}{TierColors.Tag(next)}x{TierCore(e)} + æ±ç”¨x{TierCommon(e, next)}"
                          + (why == "" ? "" : "\n<color=#ff8080>" + why + "</color>"), why == "", () => DoTierUp(eq, next));
             }
         }
@@ -273,76 +273,76 @@ namespace SteamEngineer
         {
             if (TierWhy(e, next) != "") return;
             S.AddStock(e.sourceArea.name, next, -TierCore(e)); S.commonMaterials -= TierCommon(e, next); S.SetTier(e.name, next);
-            notice = $"{e.displayName} ‚ª [{next.Label()}] ‚É‚È‚Á‚½"; S.Write();
+            notice = $"{e.displayName} ãŒ [{next.Label()}] ã«ãªã£ãŸ"; S.Write();
         }
 
         void BuildLocked(string achId)
         {
-            AddHeader("y–¢‰ğ•úz‚±‚Ì‹@”\‚ÍAÀÑ‚ğ’B¬‚·‚é‚Æg‚¦‚é‚æ‚¤‚É‚È‚è‚Ü‚·", 70f);
+            AddHeader("ã€æœªè§£æ”¾ã€‘ã“ã®æ©Ÿèƒ½ã¯ã€å®Ÿç¸¾ã‚’é”æˆã™ã‚‹ã¨ä½¿ãˆã‚‹ã‚ˆã†ã«ãªã‚Šã¾ã™", 70f);
             var d = Achievements.Find(achId); if (d == null) return;
             var t = MakeText("Lock", content, Achievements.Describe(d, S), 32, Cream, TextAlignmentOptions.TopLeft);
             t.gameObject.AddComponent<LayoutElement>().preferredHeight = 260f;
         }
 
-        // ---------- ƒ^ƒu3: Šî‘b‹­‰» ----------
+        // ---------- ã‚¿ãƒ–3: åŸºç¤å¼·åŒ– ----------
         void BuildBase()
         {
-            AddHeader("ƒRƒA1‚Â‚ÅA•”ˆÊ‚ÌŠî‘bƒŒƒxƒ‹‚ª1ã‚ª‚è‚Ü‚·BŠJnƒŒƒxƒ‹‚ÍŠî‘bƒŒƒxƒ‹‚Ü‚Å‰º‚°‚ç‚ê‚Ü‚·(”›‚èƒvƒŒƒC)", 90f);
+            AddHeader("ã‚³ã‚¢1ã¤ã§ã€éƒ¨ä½ã®åŸºç¤ãƒ¬ãƒ™ãƒ«ãŒ1ä¸ŠãŒã‚Šã¾ã™ã€‚é–‹å§‹ãƒ¬ãƒ™ãƒ«ã¯åŸºç¤ãƒ¬ãƒ™ãƒ«ã¾ã§ä¸‹ã’ã‚‰ã‚Œã¾ã™(ç¸›ã‚Šãƒ—ãƒ¬ã‚¤)", 90f);
             for (int s = 0; s < 4; s++)
             {
                 int slot = s; var row = AddRow(96f);
-                var lbl = MakeText("L", row, $"{slotNames[s]}   Šî‘bLv {S.baseLevel[s]}/{MaxBase}   ŠJnLv {S.StartLevel(s)}" + (S.StartLevel(s) < S.baseLevel[s] ? "  (”›‚è)" : ""), 32, Cream, TextAlignmentOptions.MidlineLeft);
+                var lbl = MakeText("L", row, $"{slotNames[s]}   åŸºç¤Lv {S.baseLevel[s]}/{MaxBase}   é–‹å§‹Lv {S.StartLevel(s)}" + (S.StartLevel(s) < S.baseLevel[s] ? "  (ç¸›ã‚Š)" : ""), 32, Cream, TextAlignmentOptions.MidlineLeft);
                 var le = lbl.gameObject.AddComponent<LayoutElement>(); le.flexibleWidth = 2f; le.minWidth = 560f;
-                AddBtn(row, "Šî‘b+1\nƒRƒA1", S.cores > 0 && S.baseLevel[s] < MaxBase, false, () => { S.SpendCore((EquipSlot)slot); S.Write(); notice = $"{slotNames[slot]}‚ÌŠî‘bƒŒƒxƒ‹‚ªã‚ª‚Á‚½"; }, 200f);
-                AddBtn(row, "ŠJnLv\n-", S.StartLevel(s) > 0, false, () => { S.startLevel[slot] = Mathf.Max(0, S.StartLevel(slot) - 1); S.Write(); }, 120f);
-                AddBtn(row, "ŠJnLv\n+", S.StartLevel(s) < S.baseLevel[s], false, () => { S.startLevel[slot] = Mathf.Min(S.baseLevel[slot], S.StartLevel(slot) + 1); S.Write(); }, 120f);
+                AddBtn(row, "åŸºç¤+1\nã‚³ã‚¢1", S.cores > 0 && S.baseLevel[s] < MaxBase, false, () => { S.SpendCore((EquipSlot)slot); S.Write(); notice = $"{slotNames[slot]}ã®åŸºç¤ãƒ¬ãƒ™ãƒ«ãŒä¸ŠãŒã£ãŸ"; }, 200f);
+                AddBtn(row, "é–‹å§‹Lv\n-", S.StartLevel(s) > 0, false, () => { S.startLevel[slot] = Mathf.Max(0, S.StartLevel(slot) - 1); S.Write(); }, 120f);
+                AddBtn(row, "é–‹å§‹Lv\n+", S.StartLevel(s) < S.baseLevel[s], false, () => { S.startLevel[slot] = Mathf.Min(S.baseLevel[slot], S.StartLevel(slot) + 1); S.Write(); }, 120f);
             }
         }
 
-        // ---------- ƒ^ƒu5: ƒAƒCƒeƒ€(ì¬‚Æ‚¿‚İ) ----------
+        // ---------- ã‚¿ãƒ–5: ã‚¢ã‚¤ãƒ†ãƒ (ä½œæˆã¨æŒã¡è¾¼ã¿) ----------
         void BuildItems()
         {
-            AddHeader($"•â•ƒAƒCƒeƒ€‚ğA”Ä—p‘fŞ‚Åì‚è‚Ü‚·B1ü‚ÉAí—Ş‚²‚Æ‚ÉÅ‘å{ItemManager.CarryPerKind}ŒÂ‚Ü‚Å‚¿‚ß‚Ü‚·Bg‚¢c‚µ‚ÍAü‰ñ‚ÌI—¹‚ÉÁ‚¦‚Ü‚·", 100f);
-            if (G.itemPool == null || G.itemPool.Length == 0) { AddHeader("ƒAƒCƒeƒ€‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ(Tools > TechTopia > •â•ƒAƒCƒeƒ€‚ğì¬)", 60f); return; }
+            AddHeader($"è£œåŠ©ã‚¢ã‚¤ãƒ†ãƒ ã‚’ã€æ±ç”¨ç´ æã§ä½œã‚Šã¾ã™ã€‚1å‘¨ã«ã€ç¨®é¡ã”ã¨ã«æœ€å¤§{ItemManager.CarryPerKind}å€‹ã¾ã§æŒã¡è¾¼ã‚ã¾ã™ã€‚ä½¿ã„æ®‹ã—ã¯ã€å‘¨å›ã®çµ‚äº†æ™‚ã«æ¶ˆãˆã¾ã™", 100f);
+            if (G.itemPool == null || G.itemPool.Length == 0) { AddHeader("ã‚¢ã‚¤ãƒ†ãƒ ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“(Tools > TechTopia > è£œåŠ©ã‚¢ã‚¤ãƒ†ãƒ ã‚’ä½œæˆ)", 60f); return; }
             foreach (var it in G.itemPool)
             {
                 if (it == null) continue; var item = it;
                 bool open = string.IsNullOrEmpty(it.requireUnlock) || S.Has(it.requireUnlock);
                 int own = S.ItemOwned(it.name), carry = S.ItemCarry(it.name);
-                AddHeader($"{it.displayName}   Š {own}   ‚¿‚İ {carry}/{ItemManager.CarryPerKind}", 48f);
-                var desc = MakeText("D", content, $"{it.description}\ng‚¦‚éê–Ê: {ItemManager.WhenText(it)}", 32, Cream, TextAlignmentOptions.TopLeft);
+                AddHeader($"{it.displayName}   æ‰€æŒ {own}   æŒã¡è¾¼ã¿ {carry}/{ItemManager.CarryPerKind}", 48f);
+                var desc = MakeText("D", content, $"{it.description}\nä½¿ãˆã‚‹å ´é¢: {ItemManager.WhenText(it)}", 32, Cream, TextAlignmentOptions.TopLeft);
                 desc.gameObject.AddComponent<LayoutElement>().preferredHeight = 110f;
                 var row = AddRow(96f);
-                string why = !open ? "–¢‰ğ•ú(ÀÑ)" : S.commonMaterials < it.craftCost ? $"”Ä—p‘fŞ•s‘« {S.commonMaterials}/{it.craftCost}" : "";
-                AddBtn(row, $"ì¬\n”Ä—p x{it.craftCost}" + (why == "" ? "" : $"\n<color=#ff8080>{why}</color>"), why == "",
-                       false, () => { S.commonMaterials -= item.craftCost; S.AddItem(item.name, 1); notice = $"ì¬‚µ‚½: {item.displayName}"; S.Write(); }, 300f);
-                AddBtn(row, "‚¿‚İ\n-", carry > 0, false, () => { S.SetCarry(item.name, S.ItemCarry(item.name) - 1); S.Write(); }, 200f);
-                AddBtn(row, "‚¿‚İ\n+", carry < Mathf.Min(own, ItemManager.CarryPerKind), false, () => { S.SetCarry(item.name, S.ItemCarry(item.name) + 1); S.Write(); }, 200f);
+                string why = !open ? "æœªè§£æ”¾(å®Ÿç¸¾)" : S.commonMaterials < it.craftCost ? $"æ±ç”¨ç´ æä¸è¶³ {S.commonMaterials}/{it.craftCost}" : "";
+                AddBtn(row, $"ä½œæˆ\næ±ç”¨ x{it.craftCost}" + (why == "" ? "" : $"\n<color=#ff8080>{why}</color>"), why == "",
+                       false, () => { S.commonMaterials -= item.craftCost; S.AddItem(item.name, 1); notice = $"ä½œæˆã—ãŸ: {item.displayName}"; S.Write(); }, 300f);
+                AddBtn(row, "æŒã¡è¾¼ã¿\n-", carry > 0, false, () => { S.SetCarry(item.name, S.ItemCarry(item.name) - 1); S.Write(); }, 200f);
+                AddBtn(row, "æŒã¡è¾¼ã¿\n+", carry < Mathf.Min(own, ItemManager.CarryPerKind), false, () => { S.SetCarry(item.name, S.ItemCarry(item.name) + 1); S.Write(); }, 200f);
             }
         }
 
-        // ---------- ƒ^ƒu4: ‘fŞ(‡¬E•ª‰ğ) ----------
+        // ---------- ã‚¿ãƒ–4: ç´ æ(åˆæˆãƒ»åˆ†è§£) ----------
         void BuildMat()
         {
-            AddHeader("‘fŞ‚ÌİŒÉ‚Å‚·(ü‰ñ‚ÌI—¹‚É´Z‚³‚ê‚½‘fŞ)B‡¬‚Í3ŒÂ‚ÅãˆÊ1ŒÂA•ª‰ğ‚Í”Ä—p‘fŞ‚É‚È‚è‚Ü‚·", 90f);
+            AddHeader("ç´ æã®åœ¨åº«ã§ã™(å‘¨å›ã®çµ‚äº†æ™‚ã«æ¸…ç®—ã•ã‚ŒãŸç´ æ)ã€‚åˆæˆã¯3å€‹ã§ä¸Šä½1å€‹ã€åˆ†è§£ã¯æ±ç”¨ç´ æã«ãªã‚Šã¾ã™", 90f);
             bool any = false;
             foreach (var a in G.allAreas)
                 for (int t = 0; t < 5; t++)
                 {
                     var area = a; var tier = (Tier)t; int n = S.Stock(a.name, tier); if (n <= 0) continue; any = true;
-                    AddHeader($"{a.materialName}[{tier.Label()}]  İŒÉ {n}", 48f);
+                    AddHeader($"{a.materialName}{TierColors.Tag(tier)}  åœ¨åº« {n}", 48f);
                     if (n >= 3 && t < 4)
                     {
                         bool ok = tier < MaxTier;
-                        AddEntry($"‡¬ x3 ¨ {a.materialName}[{((Tier)(t + 1)).Label()}]" + (ok ? "" : "\n<color=#ff8080>H–[ƒ‰ƒ“ƒN•s‘«</color>"), ok,
-                                 () => { S.AddStock(area.name, tier, -3); S.AddStock(area.name, tier + 1, 1); notice = "‡¬‚µ‚½"; S.Write(); });
+                        AddEntry($"åˆæˆ x3 â†’ {a.materialName}{TierColors.Tag((Tier)(t + 1))}" + (ok ? "" : "\n<color=#ff8080>å·¥æˆ¿ãƒ©ãƒ³ã‚¯ä¸è¶³</color>"), ok,
+                                 () => { S.AddStock(area.name, tier, -3); S.AddStock(area.name, tier + 1, 1); notice = "åˆæˆã—ãŸ"; S.Write(); });
                     }
                     int y = G.disassembleBase * (t + 1);
-                    AddEntry($"•ª‰ğ x1 ¨ ”Ä—p‘fŞ +{y}", true, () => { S.AddStock(area.name, tier, -1); S.commonMaterials += y; notice = $"•ª‰ğ‚µ‚½: ”Ä—p‘fŞ +{y}"; S.Write(); });
+                    AddEntry($"åˆ†è§£ x1 â†’ æ±ç”¨ç´ æ +{y}", true, () => { S.AddStock(area.name, tier, -1); S.commonMaterials += y; notice = $"åˆ†è§£ã—ãŸ: æ±ç”¨ç´ æ +{y}"; S.Write(); });
                     if (n >= 2)
-                        AddEntry($"•ª‰ğ x{n}(‚·‚×‚Ä) ¨ ”Ä—p‘fŞ +{y * n}", true, () => { S.AddStock(area.name, tier, -n); S.commonMaterials += y * n; notice = $"•ª‰ğ‚µ‚½: ”Ä—p‘fŞ +{y * n}"; S.Write(); });
+                        AddEntry($"åˆ†è§£ x{n}(ã™ã¹ã¦) â†’ æ±ç”¨ç´ æ +{y * n}", true, () => { S.AddStock(area.name, tier, -n); S.commonMaterials += y * n; notice = $"åˆ†è§£ã—ãŸ: æ±ç”¨ç´ æ +{y * n}"; S.Write(); });
                 }
-            if (!any) AddHeader("‘fŞ‚Í‚ ‚è‚Ü‚¹‚ñBü‰ñ‚ÅW‚ß‚½‘fŞ‚ÍAü‰ñ‚ÌI—¹‚É‚±‚±‚Ö“ü‚è‚Ü‚·", 60f);
+            if (!any) AddHeader("ç´ æã¯ã‚ã‚Šã¾ã›ã‚“ã€‚å‘¨å›ã§é›†ã‚ãŸç´ æã¯ã€å‘¨å›ã®çµ‚äº†æ™‚ã«ã“ã“ã¸å…¥ã‚Šã¾ã™", 60f);
         }
     }
 }

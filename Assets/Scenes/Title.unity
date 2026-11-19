@@ -1392,6 +1392,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 02abe09a409aa934ca38454a7e866c45, type: 2}
   - {fileID: 11400000, guid: 0c322c1e7ae7e3d4fa0445283fe6821c, type: 2}
   visitsPerArea: 2
+  runLength: 0
+  exhibitionStages: 3
+  standardStages: 5
   keepTierOnCarryOver: 0
   scaleEnemies: 1
   enemyHpPerPower: 0.05
@@ -2545,8 +2548,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.TitleUI
   startButton: {fileID: 0}
   info: {fileID: 463805316}
-  rowRoot: {fileID: 0}
-  rowPrefab: {fileID: 7071718222031573268, guid: bd7e4ae449d3d7843a63fcccccaf1210, type: 3}
 --- !u!4 &1836737733
 Transform:
   m_ObjectHideFlags: 0

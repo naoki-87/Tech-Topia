@@ -5,15 +5,15 @@ namespace SteamEngineer
     public class TitleUI : MonoBehaviour
     {
         public Button startButton; public TMP_Text info;
-        public Transform rowRoot; public BaseRow rowPrefab;            // 旧UI(使わない。割り当てはそのままでよい)
+                    // 旧UI(使わない。割り当てはそのままでよい)
         static readonly string[] rankNames = { "素人", "職人", "達人", "工房", "伝説" };
-        static readonly Color Dark = new Color32(0x2B, 0x1D, 0x12, 255), Brass = new Color32(0xB8, 0x86, 0x0B, 255), Cream = new Color32(0xF0, 0xDC, 0xB8, 255);
+        static Color Dark => UiKit.Dark; static Color Brass => UiKit.Brass; static Color Cream => UiKit.Cream;
         RectTransform menu; TMP_Text toast; float toastUntil; EquipmentUI equip; HelpPanel help; AchievementUI ach; SettingsUI set; TutorialMenuUI tut;
 
         void Start()
         {
             if (startButton) startButton.gameObject.SetActive(false);
-            if (rowRoot) rowRoot.gameObject.SetActive(false);
+            
             var canvas = info.canvas.rootCanvas;
             equip = gameObject.AddComponent<EquipmentUI>(); equip.Init(canvas);
             ach = gameObject.AddComponent<AchievementUI>(); ach.Init(canvas);
