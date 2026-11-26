@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24928490dde149e4cb3f061a65e65fcb, type: 3}
+  m_Name: Evolved_Suit
+  m_EditorClassIdentifier: Assembly-CSharp::SteamEngineer.EquipmentData
+  displayName: "\u5f37\u5316\u4f5c\u696d\u7740"
+  description: "\u4f53\u529b\u3068\u30a8\u30cd\u30eb\u30ae\u30fc\u6027\u80fd\u3092\u5f37\u5316\u3057\u305f\u9032\u5316\u88c5\u5099\u3002"
+  icon: {fileID: 0}
+  slot: 1
+  sourceArea: {fileID: 11400000, guid: c521eb94aadcbbe40be551970fa1c911, type: 2}
+  isStarter: 0
+  coreCost: 3
+  commonCost: 5
+  hpBase: 2
+  hpPerLevel: 1
+  dmgRedBase: 0
+  dmgRedPerLevel: 0
+  attackBase: 0
+  attackPerLevel: 0
+  extraJumps: 0
+  dashCdReductionPerLevel: 0
+  energyMaxBase: 10
+  energyMaxPerLevel: 6
+  regenBase: 2
+  regenPerLevel: 1.5
+  costReducePerLevel: 0
+  ability: {fileID: 0}
+  passive: {fileID: 11400000, guid: c6578ce63ef5e3844abc042b11471777, type: 2}
+  evolvesTo: {fileID: 0}
+  evolveLevel: 8
+  evolutionOnly: 1

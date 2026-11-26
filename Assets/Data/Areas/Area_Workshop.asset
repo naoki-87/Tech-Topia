@@ -22,7 +22,11 @@ MonoBehaviour:
   - {fileID: 8704606963915327802, guid: 55c06bb0f1418574fa86a5c69619f33c, type: 3}
   - {fileID: 3483358668282175389, guid: a88cb203dc96ad54a996ea7f30571561, type: 3}
   bossStagePrefab: {fileID: 1139021799159812692, guid: 36d3ad3d5b816c74ab4fab871cc172a6, type: 3}
-  craftable: []
+  craftable:
+  - {fileID: 11400000, guid: 10b08521511443e28d07b7c9ee327841, type: 2}
+  - {fileID: 11400000, guid: 815417b5bb5a4f5487974d674cfe8bd4, type: 2}
+  - {fileID: 11400000, guid: c816fa34a235434bb0e6ff4a4f163def, type: 2}
+  - {fileID: 11400000, guid: c59e377e65794ac5bb51b16e5fa040ff, type: 2}
   requiredRank: 0
   description: "\u6A5F\u68B0\u3068\u90E8\u54C1\u306E\u6575\u3002\u84B8\u6C17\u3084\u6B6F\u8ECA\u306E\u30AE\u30DF\u30C3\u30AF\u304C\u591A\u3044"
   backgroundColor: {r: 0.1, g: 0.06666667, b: 0.043137256, a: 1}

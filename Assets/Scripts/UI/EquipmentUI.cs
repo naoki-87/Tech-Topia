@@ -166,6 +166,7 @@ namespace SteamEngineer
                 AddHeader($"{slotNames[s]}   装着中: {curEq.displayName}{TierColors.Tag(S.GetTier(curEq.name))}   基礎Lv {S.baseLevel[s]}");
                 var row = AddRow(96f);
                 AddBtn(row, $"初期装備\n{starter.displayName}{TierColors.Tag(S.GetTier(starter.name), cur == "")}", true, cur == "", () => Pick(slot, "", starter));
+                AddStarterEvolution(starter, slot);
                 foreach (var o in S.owned)
                 {
                     var e = G.FindEquipment(o.id); if (e == null || (int)e.slot != s) continue;
@@ -173,6 +174,33 @@ namespace SteamEngineer
                     AddBtn(row, $"解放済み\n{e.displayName}{TierColors.Tag(S.GetTier(e.name), cur == id)}", true, cur == id, () => Pick(slot, id, eq));
                 }
             }
+        }
+        void AddStarterEvolution(EquipmentData starter, int slot)
+        {
+            var evolved = starter.evolvesTo;
+            if (evolved == null) return;
+            if (Owns(evolved))
+            {
+                AddEntry($"\u9032\u5316\u6e08\u307f: {evolved.displayName}\uff08\u88c5\u5099\u30bf\u30d6\u304b\u3089\u9078\u629e\u3067\u304d\u307e\u3059\uff09", false, null);
+                return;
+            }
+            if (!S.Has(Unlocks.StarterEvolution))
+            {
+                AddEntry("\u9032\u5316\u6761\u4ef6: \u5b9f\u7e3e\u300c\u521d\u671f\u88c5\u5099\u306e\u719f\u7df4\u8005\u300d\u3092\u9054\u6210", false, null);
+                return;
+            }
+            int level = S.baseLevel[slot]; Tier tier = S.GetTier(starter.name);
+            bool levelOk = level >= 5, tierOk = tier >= Tier.Common;
+            string status = $"\u57fa\u790eLv {level}/5\u30fb\u30c6\u30a3\u30a2 {tier.Label()}\uff08\u51e1\u4f5c\u4ee5\u4e0a\u304c\u5fc5\u8981\uff09";
+            AddEntry($"\u9032\u5316: {evolved.displayName}\u3000{status}", levelOk && tierOk,
+                levelOk && tierOk ? () => Evolve(starter, evolved) : null);
+        }
+        void Evolve(EquipmentData starter, EquipmentData evolved)
+        {
+            if (!S.Has(Unlocks.StarterEvolution) || S.baseLevel[(int)starter.slot] < 5 || S.GetTier(starter.name) < Tier.Common || Owns(evolved)) return;
+            Tier inheritedTier = S.GetTier(starter.name);
+            S.Unlock(evolved, inheritedTier);
+            S.Write(); notice = $"{evolved.displayName} \u3092\u89e3\u653e\u3057\u307e\u3057\u305f\u3002\u88c5\u5099\u30bf\u30d6\u304b\u3089\u9078\u3079\u307e\u3059\u3002";
         }
         void Pick(int slot, string id, EquipmentData e)
         {
@@ -223,7 +251,7 @@ namespace SteamEngineer
                 if (a == null || a.craftable == null) continue;
                 foreach (var e in a.craftable)
                 {
-                    if (e == null || Owns(e)) continue;
+                    if (e == null || Owns(e) || e.evolutionOnly) continue;
                     for (int t = 0; t <= (int)MaxTier; t++)
                     {
                         var tr = (Tier)t; var eq = e; var ar = a;

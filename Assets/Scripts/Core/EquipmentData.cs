@@ -24,5 +24,6 @@ namespace SteamEngineer
         public AbilityBase ability;
         public PassiveBase passive;
         [Header("Evolution (初期装備)")] public EquipmentData evolvesTo; public int evolveLevel = 8;
+        public bool evolutionOnly;
     }
 }

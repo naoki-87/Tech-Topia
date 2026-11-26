@@ -1,7 +1,7 @@
 using System; using System.Collections.Generic; using System.Text; using UnityEngine;
 namespace SteamEngineer
 {
-    public static class Unlocks { public const string BaseEnhance = "base_enhance", TierRank = "tier_rank"; }
+    public static class Unlocks { public const string BaseEnhance = "base_enhance", TierRank = "tier_rank"; public const string StarterEvolution = "starter_evolution"; }
     public enum AchRoute { Main, Sub }
     public class AchCond { public string label; public Func<SaveData, int> cur; public int goal; }
     public class AchDef
@@ -25,6 +25,9 @@ namespace SteamEngineer
             new AchDef { id = "main_workshop", route = AchRoute.Main, name = "工房の腕前", desc = "5周クリアし、3種類の装備を作る",
                 reward = "「ティア上昇」と「工房ランク」が解放される",
                 conds = new[] { C("周回クリア", s => s.Stat("runs_cleared"), 5), C("作成した装備の種類", s => s.owned.Count, 3) }, unlocks = new[] { Unlocks.TierRank } },
+            new AchDef { id = "main_starter_master", route = AchRoute.Main, name = "\u521d\u671f\u88c5\u5099\u306e\u719f\u7df4\u8005", desc = "\u521d\u671f\u88c5\u5099\u3060\u3051\u30673\u5468\u30af\u30ea\u30a2\u3059\u308b",
+                reward = "\u521d\u671f\u88c5\u5099\u306e\u9032\u5316\u304c\u89e3\u653e\u3055\u308c\u308b",
+                conds = new[] { C("\u521d\u671f\u88c5\u5099\u3060\u3051\u3067\u5468\u56de\u30af\u30ea\u30a2", s => s.Stat("runs_starter_cleared"), 3) }, unlocks = new[] { Unlocks.StarterEvolution } },
         };
 
         public static AchDef Find(string id) { foreach (var d in All) if (d.id == id) return d; return null; }

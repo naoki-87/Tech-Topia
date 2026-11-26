@@ -18,6 +18,7 @@ namespace SteamEngineer
         public AreaData current;
         public int areasCleared, totalAreas, stageIndex, stagesCleared, rerolls = 1, coresCollected, hp;
         public bool won, swapped, reviveUsed;
+        public bool starterOnly = true;
         public Dictionary<ItemData, int> itemBag = new Dictionary<ItemData, int>();    // 持ち込んだアイテム
         public int itemAttack, itemMaxHp;                                              // アイテムによる、この周回だけの上昇
         public AreaData forcedArea;                                                    // 羅針盤で指定されたエリア
@@ -57,6 +58,7 @@ namespace SteamEngineer
                     var t = save.GetTier(e.name);
                     if (save.loadout[s] == o.id)
                     {
+                        if (!e.isStarter) starterOnly = false;
                         if (equipped[s] != null) stash[equipped[s]] = new EquipState { tier = tier[s], level = level[s] };   // 初期装備は持ち物へ
                         equipped[s] = e; tier[s] = t; swapped = true;
                     }
@@ -177,6 +179,7 @@ namespace SteamEngineer
         public bool Equip(EquipmentData e)
         {
             if (e == null || !stash.TryGetValue(e, out var st)) return false;
+            if (!e.isStarter) starterOnly = false;
             int i = (int)e.slot; Stow(i); stash.Remove(e);
             equipped[i] = e; tier[i] = st.tier; level[i] = st.level; swapped = true;
             ClampHp(); return true;
@@ -212,8 +215,6 @@ namespace SteamEngineer
         public void Upgrade(EquipSlot s)
         {
             int i = (int)s; level[i]++;
-            var e = equipped[i];
-            if (e != null && e.isStarter && e.evolvesTo != null && !swapped && level[i] >= e.evolveLevel) equipped[i] = e.evolvesTo;
         }
 
         // ---------- 遺物 ----------

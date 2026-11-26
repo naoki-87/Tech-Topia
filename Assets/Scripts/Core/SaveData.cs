@@ -70,6 +70,7 @@ namespace SteamEngineer
             }
             lastSummary = (sb.Length > 0 ? "【素材を清算】\n" + sb : "【素材を清算】なし") + $"\n汎用素材 +{common}" + (win ? $"  コア +{run.coresCollected}" : "");
             AddStat("runs", 1); if (win) AddStat("runs_cleared", 1); AddStat("areas_cleared", run.areasCleared);
+            if (win && run.starterOnly) AddStat("runs_starter_cleared", 1);
             var news = Achievements.CheckAll(this);
             if (news.Count > 0) lastSummary += "\n\n★ 実績を達成！\n" + string.Join("\n", news);
         }
