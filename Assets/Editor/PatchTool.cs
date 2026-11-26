@@ -84,6 +84,7 @@ namespace SteamEngineer.EditorTools
                     if (cmd == "@@WITH" && mode == 1) { cur.find = string.Join("\n", buf.ToArray()); mode = 2; buf.Clear(); continue; }
                     if (cmd == "@@END" && mode == 2) { cur.with = string.Join("\n", buf.ToArray()); ops.Add(cur); cur = null; mode = 0; continue; }
                     if (cmd == "@@NEW" && mode == 0) { cur = new Op { kind = "NEW", path = arg, line = no }; mode = 3; buf.Clear(); continue; }
+                    if (cmd == "@@OVERWRITE" && mode == 0) { cur = new Op { kind = "OVERWRITE", file = arg, line = no }; mode = 3; buf.Clear(); continue; }
                     if (cmd == "@@END" && mode == 3) { cur.with = string.Join("\n", buf.ToArray()).TrimEnd('\n') + "\n"; ops.Add(cur); cur = null; mode = 0; continue; }
                     if (cmd == "@@DELETE" && mode == 0) { ops.Add(new Op { kind = "DELETE", file = arg, line = no }); continue; }
                     err = no + "行目: 位置が正しくないか、知らない命令です: " + l.Trim(); return null;
@@ -107,6 +108,14 @@ namespace SteamEngineer.EditorTools
                     if (File.Exists(abs) && !s.text.ContainsKey(abs)) { s.touched.Add(abs); s.crlf[abs] = false; s.warnings.Add("既にあるファイルを上書きします: " + op.path); }
                     else if (!File.Exists(abs)) s.created.Add(abs);
                     s.text[abs] = op.with; continue;
+                }
+                if (op.kind == "OVERWRITE")
+                {
+                    string pr; string ap = Resolve(op.file, out pr);
+                    if (ap == null) { s.errors.Add(op.line + "行目 " + op.file + ": " + pr + "(丸ごと入れ替えるファイルが見つかりません)"); continue; }
+                    s.touched.Add(ap); s.crlf[ap] = false; s.text[ap] = op.with;
+                    s.warnings.Add(op.file + ": 中身を丸ごと入れ替えます");
+                    continue;
                 }
                 string problem; string p = Resolve(op.file, out problem);
                 if (p == null)

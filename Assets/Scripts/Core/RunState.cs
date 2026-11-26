@@ -113,7 +113,7 @@ namespace SteamEngineer
             float bonus = RelicValue(RelicEffect.Greed);
             for (int i = 0; i < Slots; i++)
                 if (equipped[i] != null && equipped[i].passive != null) bonus += equipped[i].passive.MatGainBonus(tier[i]);
-            matCarry += n * (1f + bonus);
+            matCarry += n * (1f + bonus) * RunExtras.MatMod;
             int gain = Mathf.FloorToInt(matCarry + 0.0001f);
             matCarry = Mathf.Max(0f, matCarry - gain);
             if (gain <= 0) return;

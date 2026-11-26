@@ -37,10 +37,10 @@ namespace SteamEngineer
                     m = Mathf.Min(enemyHpCap, 1f + enemyHpPerPower * Run.EquipPower());   // 装備の強化度合い
                     m *= 1f + enemyHpPerArea * Run.areasCleared;                           // 攻略したエリアの数
                 }
-                return m * (1f + Run.RelicValue2(RelicEffect.Greed));                      // 強欲な歯車
+                return m * (1f + Run.RelicValue2(RelicEffect.Greed)) * RunExtras.EnemyHpMod;                      // 強欲な歯車
             }
         }
-        public int EnemyDmgBonus => (!scaleEnemies || Run == null) ? 0 : Mathf.Min(enemyDmgMax, Run.EquipPower() / Mathf.Max(1, enemyDmgStep));
+        public int EnemyDmgBonus => ((!scaleEnemies || Run == null) ? 0 : Mathf.Min(enemyDmgMax, Run.EquipPower() / Mathf.Max(1, enemyDmgStep))) + RunExtras.EnemyDmgMod;
 
         void Awake()
         {
@@ -71,19 +71,19 @@ namespace SteamEngineer
                 if (it == null || n <= 0) continue;
                 Save.AddItem(e.id, -n); Run.itemBag[it] = n;
             }
-            Save.carry.Clear(); Save.Write();
+            Save.carry.Clear(); Save.Write(); RunExtras.Reset();
             Run.RollChoices(); Load("AreaSelect");
         }
-        public void ChooseArea(AreaData a) { Run.BeginArea(a); Load("Stage"); }
+        public void ChooseArea(AreaData a) { RunExtras.SelectMod(a); Run.BeginArea(a); Load("Stage"); }
 
         public void OnStageClear()
         {
             AudioManager.Clear();
             bool wasBoss = Run.IsBossStage;
             Run.stagesCleared++; Run.stageIndex++;
-            if (Run.stageIndex >= RunState.StagesPerArea) Run.CompleteArea();
+            if (Run.stageIndex >= RunState.StagesPerArea) { RunExtras.OnAreaClear(Run, Save); Run.CompleteArea(); }
             // 遺物の提示: 最初のステージのあと、最終以外のボスのあと
-            if (Run.stagesCleared == 1 || (wasBoss && Run.remaining.Count > 0)) Run.OfferRelics(relicPool);
+            if (Run.stagesCleared == 1 || (wasBoss && Run.remaining.Count > 0)) Run.OfferRelics(relicPool, RunExtras.RelicChoices());
             Load("Garage");
         }
         public void AfterGarage()
