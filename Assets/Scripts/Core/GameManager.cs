@@ -65,6 +65,7 @@ namespace SteamEngineer
             RunState.StagesPerArea = runLength == RunLength.Exhibition ? exhibitionStages : standardStages;
             int visits = runLength == RunLength.Exhibition ? visitsPerArea : 1;
             Run = new RunState(allAreas, starters, Save, lv, visits, FindEquipment, keepTierOnCarryOver);
+            Run.generationSeed = Random.Range(1, int.MaxValue);
             foreach (var e in new System.Collections.Generic.List<ItemEntry>(Save.carry))
             {
                 var it = ItemManager.Find(e.id); int n = Mathf.Min(e.count, Save.ItemOwned(e.id), ItemManager.CarryPerKind);

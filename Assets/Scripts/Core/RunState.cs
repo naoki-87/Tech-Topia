@@ -17,6 +17,7 @@ namespace SteamEngineer
         public Dictionary<AreaData, int> visits = new Dictionary<AreaData, int>();
         public AreaData current;
         public int areasCleared, totalAreas, stageIndex, stagesCleared, rerolls = 1, coresCollected, hp;
+        public int generationSeed;
         public bool won, swapped, reviveUsed;
         public bool starterOnly = true;
         public Dictionary<ItemData, int> itemBag = new Dictionary<ItemData, int>();    // 持ち込んだアイテム

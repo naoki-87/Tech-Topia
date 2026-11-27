@@ -18,8 +18,19 @@ namespace SteamEngineer
                 sr.sprite = area.background; sr.sortingOrder = -10;
                 go.AddComponent<ParallaxBackground>();
             }
-            var prefab = run.IsBossStage ? area.bossStagePrefab : area.stagePrefabs[Random.Range(0, area.stagePrefabs.Length)];
-            Instantiate(prefab);
+            if (run.IsBossStage)
+                Instantiate(area.bossStagePrefab);
+            else
+            {
+                int seed = unchecked(run.generationSeed + (run.stagesCleared + 1) * 10007 + run.stageIndex);
+                var generated = area.generatedStages != null ? StageGenerator.TryGenerate(area.generatedStages, seed) : null;
+                if (generated == null)
+                {
+                    if (area.stagePrefabs != null && area.stagePrefabs.Length > 0)
+                        Instantiate(area.stagePrefabs[Random.Range(0, area.stagePrefabs.Length)]);
+                    else Debug.LogError($"Area {area.name} に通常ステージPrefabも生成プロファイルもありません");
+                }
+            }
             Debug.Log($"[難易度] 装備パワー {run.EquipPower()} → 敵HP ×{GameManager.Instance.EnemyHpMul:0.00} / ダメージ +{GameManager.Instance.EnemyDmgBonus}");
             var spawn = GameObject.Find("PlayerSpawn");
             Instantiate(playerPrefab, spawn ? spawn.transform.position : Vector3.zero, Quaternion.identity);

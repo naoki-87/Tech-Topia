@@ -10,6 +10,7 @@ namespace SteamEngineer
         public Sprite icon;
         public GameObject[] stagePrefabs;     // 通常ステージ(ランダム選択)
         public GameObject bossStagePrefab;    // 5ステージ目
+        public StageGenerationProfile generatedStages; // 設定時は通常ステージを部屋Prefabから生成
         public EquipmentData[] craftable;     // このエリアの素材で作れる装備
         public int requiredRank;              // このエリアが選択肢に出る工房ランク(0=素人)
         [TextArea] public string description;     // エリア選択に出す、敵やギミックの紹介
